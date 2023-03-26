@@ -21,7 +21,8 @@
     "popper",
     "popover",
     "trigger",
-    "tooltip"
+    "tooltip",
+    "popflow"
   ],
   "license": "MIT",
   "scripts": {
