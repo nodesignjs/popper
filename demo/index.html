@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PopFlow</title>
+  <style>
+    :root {
+      color: #f1f2f3;
+      background: rgb(31,32,40);
+      color-scheme: dark;
+      -webkit-font-smoothing: antialiased;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+    }
+    .page {
+      width: 700px;
+      max-width: 90vw;
+      margin: 0 auto;
+    }
+    .section {
+      margin: 20px 0;
+      user-select: none;
+    }
+    .container {
+      height: 500px;
+      background: #eee;
+      overflow: hidden;
+    }
+    .c {
+      overflow: auto;
+      height: 100%;
+    }
+    .cc {
+      width: 2000px;
+      height: 2000px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #btn {
+      width: 160px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      color: #fff;
+      background: #3262fb;
+      border-radius: 6px;
+      font-size: 30px;
+      transition: background-color .2s ease;
+    }
+    #btn:hover {
+      background: #5183fc;
+    }
+    #btn:active {
+      background: #2547cf;
+    }
+    .content {
+      width: 100px;
+      height: 150px;
+      background: rgba(39, 41, 53);
+      border-radius: 4px;
+    }
+    .arrow {
+      width: 12px;
+      height: 12px;
+      transform: rotate(45deg);
+      transform-origin: center;
+      background: rgba(39, 41, 53);
+    }
+    .fade-enter-from, .fade-exit-to {
+      transform: scale(.7);
+      opacity: 0;
+    }
+    .fade-enter-active, .fade-exit-active {
+      transition: transform .1s cubic-bezier(.34,.69,.1,1), opacity .1s ease;
+    }
+    label {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    label input {
+      margin: 0 5px;
+    }
+    h1 span {
+      font-size: 56px;
+      background: linear-gradient( 120deg, #bd34fe 30%, #41d1ff );
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .tagline {
+      font-size: 20px;
+      color: rgba(235, 235, 245, .6);
+    }
+    .btn-row {
+      display: flex;
+      align-items: center;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 700;
+      margin-right: 20px;
+      cursor: pointer;
+      user-select: none;
+      background: #313136;
+      padding: 12px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: opacity .2s ease;
+      box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px rgba(0, 0,0,.1) 0px 10px 15px rgba(0, 0,0, 0.1) 0px 4px 6px -4px;
+      color: rgb(208, 173, 240);
+    }
+    .btn.pri {
+      color: #000;
+      background: linear-gradient(to right bottom, rgb(252, 165, 165),rgb(196, 181, 253),rgb(34, 211, 238));
+    }
+    .btn svg {
+      margin: 0 5px;
+    }
+    .btn:hover {
+      opacity: .8;
+    }
+    .btn:active {
+      opacity: .6;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <h1>
+        <span>PopFlow</span>
+      </h1>
+      <p class="tagline">
+        PopFlow is a small yet powerful pop-up tool library that can automatically pop up at a suitable position adjacent to the trigger.
+      </p>
+      <div class="btn-row">
+        <a class="btn pri" href="https://github.com/popflow/popflow" target="_blank">
+          Get Started 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+        <a class="btn" href="https://github.com/popflow/popflow" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          Github
+        </a>
+      </div>
+    </div>
+    <div class="section">
+      <div>
+        <label><input type="checkbox" name="cb" value="arrow" checked /> arrow</label>
+        <label><input type="checkbox" name="cb" value="autoPlacement" checked /> autoPlacement</label>
+        <label><input type="checkbox" name="cb" value="autoUpdate" checked /> autoUpdate</label>
+        <label><input type="checkbox" name="cb" value="autoScroll" checked /> autoScroll</label>
+        <label><input type="checkbox" name="cb" value="css" checked /> css animation</label>
+        <label><input type="checkbox" name="cb" value="coverTrigger" /> coverTrigger</label>
+        <label><input type="checkbox" name="cb" value="closeOnScroll" /> closeOnScroll</label>
+        <label><input type="checkbox" name="cb" value="hideOnInvisible" /> hideOnInvisible</label>
+      </div>
+      <div style="display:flex;align-items: center;justify-content: center;flex-wrap: wrap;">
+        <label style="flex: 1">translateX <input type="range" name="translateX" min="-100" max="100" value="0" /><span class="translate-x-s">0px</span></label>
+        <label style="flex: 1">translateY <input type="range" name="translateY" min="-100" max="100" value="-10" /><span class="translate-y-s">-10px</span></label>
+      </div>
+      <div>
+        <fieldset>
+          <legend>Placement</legend>
+          <label><input type="radio" name="placement" value="tl">TopLeft</label>
+          <label><input type="radio" name="placement" value="t" checked >Top</label>
+          <label><input type="radio" name="placement" value="tr">TopRight</label>
+          <label><input type="radio" name="placement" value="rt">RightTop</label>
+          <label><input type="radio" name="placement" value="r">Right</label>
+          <label><input type="radio" name="placement" value="rb">RightBottom</label>
+          <label><input type="radio" name="placement" value="bl">BottomLeft</label>
+          <label><input type="radio" name="placement" value="b">Bottom</label>
+          <label><input type="radio" name="placement" value="br">BottomRight</label>
+          <label><input type="radio" name="placement" value="lt">LeftTop</label>
+          <label><input type="radio" name="placement" value="l">Left</label>
+          <label><input type="radio" name="placement" value="lb">LeftBottom</label>
+      </fieldset>
+      </div>
+    </div>
+    <div class="container">
+      <div class="c">
+        <div class="cc">
+          <div id="btn">Click Me!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module" src="./index.ts"></script>
+</body>
+</html>
