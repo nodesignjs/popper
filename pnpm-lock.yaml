@@ -16,10 +16,10 @@ specifiers:
   terser: ^5.14.2
   typescript: ^4.7.4
   vite: ^3.0.3
-  wblib: ^1.0.12
+  wblib: ^1.0.14
 
 dependencies:
-  wblib: 1.0.12
+  wblib: 1.0.14
 
 devDependencies:
   '@babel/core': 7.21.3
@@ -3431,8 +3431,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /wblib/1.0.12:
-    resolution: {integrity: sha512-XdfJU2Fojs0FJAK/JXPpmGGiKhQ+1R9PH6fPkcACFegGb5VgQIdJSP9yWflSIab4a2oslYHNdqux/MaGQTLjdw==}
+  /wblib/1.0.14:
+    resolution: {integrity: sha512-gVJdXfup4eli9P2mAM8L09umZ7s2RKwa2Q7Z5YfaZub1EvHPOYvxSlKB5Qz+JCbPndHEQfL7qLex5t32M7XYzQ==}
     dev: false
 
   /which-boxed-primitive/1.0.2:

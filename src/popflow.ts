@@ -1,5 +1,5 @@
 import {
-  addClass, Destroyable, removeClass, destroy, addDestroyable, throttle, $,
+  addClass, Destroyable, removeClass, destroy, throttle, $, getChangedAttrs,
 } from 'wblib';
 import type {
   Position, Rect, PopFlowConfig, CssName, TransitionInfo,
@@ -18,6 +18,19 @@ function getConfig(config: PopFlowConfig) {
   } as PopFlowConfig;
 }
 
+export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
+  const el = $();
+  if (cls) addClass(el, cls);
+  Object.assign(el.style, {
+    width: '12px',
+    height: '12px',
+    transform: 'rotate(45deg)',
+    transformOrigin: 'center',
+    ...style,
+  });
+  return el;
+}
+
 export class PopFlow implements Destroyable {
   el: HTMLElement;
 
@@ -25,7 +38,7 @@ export class PopFlow implements Destroyable {
 
   opening = false;
 
-  isAnimation = false;
+  isAnimating = false;
 
   private cel: HTMLElement;
 
@@ -43,8 +56,6 @@ export class PopFlow implements Destroyable {
 
   private clearHide?: () => void;
 
-  private containerOF = false;
-
   private scrollEls?: HTMLElement[];
 
   private isTriggerEl: boolean;
@@ -55,67 +66,151 @@ export class PopFlow implements Destroyable {
 
   private arrowHide = false;
 
+  private ro?: ResizeObserver;
+
   constructor(config: PopFlowConfig) {
     const oldContainer = config.container;
     config = this.config = getConfig(config);
     this.cel = $();
-    let { style } = this.cel;
+    const { style } = this.cel;
     style.position = 'absolute';
     style.left = style.top = '0';
     const {
-      content, container, trigger, cssName,
+      content, container, trigger,
     } = config;
     const info = getContainerInfo(container!);
-    this.containerOF = config.overflowHidden == null ? info.clip : config.overflowHidden;
+    if (config.overflowHidden == null) config.overflowHidden = info.clip;
     if (oldContainer && !info.position || info.position === 'static') {
       container!.style.position = 'relative';
     }
 
     this.el = this.cel.appendChild($());
-    this.el.style.position = 'absolute';
     this.el.appendChild(content);
 
     this.isTriggerEl = trigger instanceof Element;
     if (config.autoUpdate) {
-      const ro = new ResizeObserver(() => this.update());
-      ro.observe(content);
+      const ro = this.ro = new ResizeObserver(() => this.update());
+      ro.observe(this.el);
       ro.observe(container!);
       if (this.isTriggerEl) ro.observe(trigger as HTMLElement);
-      addDestroyable(this, { destroy: () => ro.disconnect() });
     }
 
-    if (this.isTriggerEl && container && (config.autoScroll || config.closeOnScroll)) {
-      this.scrollEls = getScrollElements(trigger as HTMLElement, container);
+    if (this.needListenScroll()) {
+      this.scrollEls = getScrollElements(trigger as HTMLElement, container!);
     }
 
     if (config.arrow) {
-      this.arrowEl = $();
-      style = this.arrowEl.style;
-      style.position = 'absolute';
-      style.left = style.top = '0';
-      style.zIndex = '-1';
+      this.arrowEl = createArrowWrapper();
       this.arrowEl.appendChild(config.arrow);
       this.el.appendChild(this.arrowEl);
     }
 
-    if (cssName) {
-      this.cssName = {
-        enterFrom: `${cssName}-enter-from`,
-        enterActive: `${cssName}-enter-active`,
-        enterTo: `${cssName}-enter-to`,
-        exitFrom: `${cssName}-exit-from`,
-        exitActive: `${cssName}-exit-active`,
-        exitTo: `${cssName}-exit-to`,
-      };
-    }
+    this.setCssName();
   }
 
   update() {
-    if (this.opening && !this.isAnimation) this.open();
+    if (this.opening && !this.isAnimating) this.open();
+  }
+
+  updateConfig(config: Partial<PopFlowConfig>) {
+    const changed = getChangedAttrs(config, this.config, true);
+    if (!changed.length) return;
+
+    changed.forEach(([k, n, o]) => {
+      switch (k) {
+        case 'content':
+          this.el.removeChild(o as HTMLElement);
+          if (n) this.el.appendChild(n as HTMLElement);
+          break;
+        case 'container':
+          if (!n) config.container = document.body;
+          if (this.ro) {
+            this.ro.unobserve(o as HTMLElement);
+            this.ro.observe(config.container as HTMLElement);
+          }
+          break;
+        case 'trigger': {
+          const oldIsTriggerEl = this.isTriggerEl;
+          this.isTriggerEl = n instanceof Element;
+          if (this.ro) {
+            if (oldIsTriggerEl) this.ro.unobserve(o as HTMLElement);
+            if (this.isTriggerEl) this.ro.observe(n as HTMLElement);
+          }
+          const need = this.needListenScroll();
+          if (need) {
+            if (!this.scrollEls) {
+              const c = this.config;
+              this.scrollEls = getScrollElements(c.trigger! as HTMLElement, c.container!);
+            }
+          } else if (this.scrollEls) {
+            this.removeScrollEv();
+            this.scrollEls = undefined;
+          }
+        }
+          break;
+        case 'autoScroll':
+        case 'closeOnScroll':
+          {
+            const need = this.needListenScroll();
+            if (need) {
+              if (!this.scrollEls) {
+                const c = this.config;
+                this.scrollEls = getScrollElements(c.trigger! as HTMLElement, c.container!);
+                if (this.opening) {
+                  this.scrollEls?.forEach((x) => {
+                    x.addEventListener('scroll', this.onScroll, { passive: true });
+                  });
+                }
+              }
+            } else if (this.scrollEls) {
+              this.removeScrollEv();
+              this.scrollEls = undefined;
+            }
+          }
+          break;
+        case 'arrow':
+          if (this.arrowEl) {
+            this.arrowEl.removeChild(o as HTMLElement);
+            if (!n) {
+              this.el.removeChild(this.arrowEl);
+              this.arrowEl = undefined;
+            }
+          }
+          if (n) {
+            this.arrowEl = this.arrowEl || createArrowWrapper();
+            this.arrowEl.appendChild(n as HTMLElement);
+            this.el.appendChild(this.arrowEl);
+          }
+          break;
+        case 'autoUpdate':
+          if (n) {
+            if (!this.ro) {
+              const c = this.config;
+              const ro = this.ro = new ResizeObserver(() => this.update());
+              ro.observe(this.el);
+              ro.observe(c.container!);
+              if (this.isTriggerEl) ro.observe(c.trigger as HTMLElement);
+            }
+          } else if (this.ro) {
+            this.ro.disconnect();
+            this.ro = undefined;
+          }
+          break;
+        case 'cssName':
+          this.setCssName();
+          break;
+      }
+    });
+
+    this.update();
   }
 
   destroy() {
     const { container } = this.config;
+    if (this.ro) {
+      this.ro.disconnect();
+      this.ro = undefined;
+    }
     if (this.opening) {
       try {
         container!.removeChild(this.cel);
@@ -127,7 +222,7 @@ export class PopFlow implements Destroyable {
     cancelAnimationFrame(this.hideRaf);
     this.clearShow?.();
     this.clearHide?.();
-    this.isAnimation = true;
+    this.isAnimating = true;
     this.opening = false;
     this.removeScrollEv();
     destroy(this);
@@ -135,12 +230,12 @@ export class PopFlow implements Destroyable {
 
   open() {
     const {
-      config, cssName, opening: showing, el, arrowEl,
+      config, cssName, opening, el, arrowEl,
     } = this;
     const { container, trigger } = config;
-    const fromHide = !showing;
+    const fromHide = !opening;
     if (fromHide) {
-      if (this.isAnimation) return;
+      if (this.isAnimating) return;
       container!.appendChild(this.cel);
       this.scrollEls?.forEach((x) => {
         x.addEventListener('scroll', this.onScroll, { passive: true });
@@ -161,7 +256,7 @@ export class PopFlow implements Destroyable {
       };
     }
 
-    this.isAnimation = true;
+    this.isAnimating = true;
     if (fromHide && cssName) {
       const { onBeforeEnter } = config;
       if (onBeforeEnter) onBeforeEnter();
@@ -177,7 +272,7 @@ export class PopFlow implements Destroyable {
       });
     } else {
       requestAnimationFrame(() => {
-        this.isAnimation = false;
+        this.isAnimating = false;
       });
     }
 
@@ -188,7 +283,7 @@ export class PopFlow implements Destroyable {
       popBcr,
       config.translate!,
       config.autoPlacement,
-      this.containerOF,
+      config.overflowHidden,
       config.coverTrigger,
       arrowBcr,
       config.hideOnInvisible,
@@ -224,7 +319,7 @@ export class PopFlow implements Destroyable {
   }
 
   close() {
-    if (this.isAnimation || !this.opening) return;
+    if (this.isAnimating || !this.opening) return;
     this.opening = false;
 
     const { config, cssName, el } = this;
@@ -233,7 +328,7 @@ export class PopFlow implements Destroyable {
       const { onBeforeExit } = config;
       if (onBeforeExit) onBeforeExit();
       addClass(el, cssName.exitFrom);
-      this.isAnimation = true;
+      this.isAnimating = true;
       this.hideRaf = requestAnimationFrame(() => {
         removeClass(el, cssName.exitFrom);
         addClass(el, cssName.exitActive);
@@ -306,7 +401,7 @@ export class PopFlow implements Destroyable {
     const { onEntered } = this.config;
     removeClass(el, cssName!.enterActive);
     removeClass(el, cssName!.enterTo);
-    this.isAnimation = false;
+    this.isAnimating = false;
     if (onEntered) onEntered();
   };
 
@@ -316,9 +411,26 @@ export class PopFlow implements Destroyable {
     config.container!.removeChild(this.cel);
     removeClass(el, cssName!.exitActive);
     removeClass(el, cssName!.exitTo);
-    this.isAnimation = false;
+    this.isAnimating = false;
     if (onExited) onExited();
   };
+
+  private needListenScroll() {
+    const { config } = this;
+    return this.isTriggerEl && config.container && (config.autoScroll || config.closeOnScroll);
+  }
+
+  private setCssName() {
+    const { cssName } = this.config;
+    this.cssName = cssName ? {
+      enterFrom: `${cssName}-enter-from`,
+      enterActive: `${cssName}-enter-active`,
+      enterTo: `${cssName}-enter-to`,
+      exitFrom: `${cssName}-exit-from`,
+      exitActive: `${cssName}-exit-active`,
+      exitTo: `${cssName}-exit-to`,
+    } : undefined;
+  }
 }
 
 function getPopupOffset(
@@ -646,6 +758,15 @@ function getPopStyle(
     arrowXY,
     position,
   };
+}
+
+function createArrowWrapper() {
+  const arrowEl = $();
+  const style = arrowEl.style;
+  style.position = 'absolute';
+  style.left = style.top = '0';
+  style.zIndex = '-1';
+  return arrowEl;
 }
 
 function getTransitionInfo(el: Element): TransitionInfo {

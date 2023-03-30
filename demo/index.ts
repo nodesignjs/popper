@@ -1,4 +1,4 @@
-import { PopFlow } from '../src';
+import { PopFlow, createArrow, PLACEMENT } from '../src';
 
 window.onload = function () {
   const container = document.querySelector('.container')! as HTMLElement;
@@ -11,14 +11,12 @@ window.onload = function () {
 
   c.scrollTop = (2000 - cbb.height) / 2 + 10;
   c.scrollLeft = (2000 - cbb.width) / 2 + 10;
-  let popup;
 
   btn.onclick = () => {
     popup.toggle();
   };
 
-  const arrow = document.createElement('div');
-  arrow.classList.add('arrow');
+  const arrow = createArrow(undefined, 'arrow');
 
   const config = {
     container,
@@ -30,16 +28,15 @@ window.onload = function () {
     translate: [0, -10],
     arrow,
     cssName: 'fade',
-    placement: 't',
+    placement: PLACEMENT.T,
+  };
+  const popup = new PopFlow(config as any);
+  popup.open();
+
+  const update = () => {
+    popup.updateConfig(config);
   };
 
-  const initPopup = () => {
-    if (popup) popup.destroy();
-    popup = new PopFlow(config as any);
-    popup.toggle();
-  };
-
-  initPopup();
   const selection = document.querySelector('.section') as HTMLElement;
   selection.onchange = ({ target }) => {
     const { name, value, checked } = target as any;
@@ -51,16 +48,10 @@ window.onload = function () {
       } else {
         config[value] = checked;
       }
-      initPopup();
-    } else if (name === 'translateX') {
-      config.translate[0] = Number(value);
-      initPopup();
-    } else if (name === 'translateY') {
-      config.translate[1] = Number(value);
-      initPopup();
+      update();
     } else if (name === 'placement') {
       config.placement = value;
-      initPopup();
+      update();
     }
   };
 
@@ -71,8 +62,12 @@ window.onload = function () {
     const { name, value } = target as any;
     if (name === 'translateX') {
       transXs.textContent = `${value}px`;
+      config.translate = [Number(value), config.translate[1]];
+      update();
     } else if (name === 'translateY') {
       transYs.textContent = `${value}px`;
+      config.translate = [config.translate[0], Number(value)];
+      update();
     }
   };
 };
