@@ -1,13 +1,13 @@
 {
-  "name": "popflow",
+  "name": "@cosmo-design/popper",
   "version": "1.0.0",
   "main": "dist/index.min.js",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
   "sideEffects": false,
   "authors": "oyuyue <oyuyue@outlook.com>",
-  "repository": "git@github.com:popflow/popflow.git",
-  "homepage": "https://github.com/popflow/popflow",
+  "repository": "git@github.com:cosmo-design/popper.git",
+  "homepage": "https://github.com/cosmo-design/popper",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
@@ -21,8 +21,7 @@
     "popper",
     "popover",
     "trigger",
-    "tooltip",
-    "popflow"
+    "tooltip"
   ],
   "license": "MIT",
   "scripts": {

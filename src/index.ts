@@ -1,5 +1,5 @@
 export * from './constant';
 export * from './type';
-export * from './popflow';
+export * from './popper';
 // eslint-disable-next-line no-restricted-exports
-export { PopFlow as default } from './popflow';
+export { Popper as default } from './popper';

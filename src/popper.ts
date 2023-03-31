@@ -2,11 +2,11 @@ import {
   addClass, Destroyable, removeClass, destroy, throttle, $, getChangedAttrs,
 } from 'wblib';
 import type {
-  Position, Rect, PopFlowConfig, CssName, TransitionInfo,
+  Position, Rect, PopperConfig, CssName, TransitionInfo,
 } from './type';
 import { PLACEMENT } from './constant';
 
-function getConfig(config: PopFlowConfig) {
+function getConfig(config: PopperConfig) {
   return {
     container: document.body,
     placement: PLACEMENT.T,
@@ -15,7 +15,7 @@ function getConfig(config: PopFlowConfig) {
     autoScroll: true,
     translate: [0, 0],
     ...config,
-  } as PopFlowConfig;
+  } as PopperConfig;
 }
 
 export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
@@ -31,10 +31,10 @@ export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
   return el;
 }
 
-export class PopFlow implements Destroyable {
+export class Popper implements Destroyable {
   el: HTMLElement;
 
-  config: PopFlowConfig;
+  config: PopperConfig;
 
   opening = false;
 
@@ -68,7 +68,7 @@ export class PopFlow implements Destroyable {
 
   private ro?: ResizeObserver;
 
-  constructor(config: PopFlowConfig) {
+  constructor(config: PopperConfig) {
     const oldContainer = config.container;
     config = this.config = getConfig(config);
     this.cel = $();
@@ -112,7 +112,7 @@ export class PopFlow implements Destroyable {
     if (this.opening && !this.isAnimating) this.open();
   }
 
-  updateConfig(config: Partial<PopFlowConfig>) {
+  updateConfig(config: Partial<PopperConfig>) {
     const changed = getChangedAttrs(config, this.config, true);
     if (!changed.length) return;
 

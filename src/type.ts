@@ -6,7 +6,7 @@ export interface Position {
   arrowXY?: number[];
 }
 export type Rect = { left: number, top: number, width: number, height: number }
-export interface PopFlowConfig {
+export interface PopperConfig {
   content: Element;
   container?: HTMLElement;
   trigger: { getBoundingClientRect: () => Rect } | Element;
