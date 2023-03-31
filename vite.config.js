@@ -64,7 +64,7 @@ export default defineConfig(({ command }) => {
           emptyOutDir: false,
           lib: {
             entry: './src/index.ts',
-            name: 'popflow',
+            name: 'popper',
             formats: ['umd'],
             fileName: () => 'index.min.js'
           },

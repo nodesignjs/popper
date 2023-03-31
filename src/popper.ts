@@ -28,7 +28,7 @@ export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
     transformOrigin: 'center',
     ...style,
   });
-  return el;
+  return el as HTMLElement;
 }
 
 export class Popper implements Destroyable {

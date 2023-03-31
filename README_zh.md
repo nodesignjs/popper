@@ -1,35 +1,35 @@
-# [PopFlow](https://popflow.github.io/popflow/)
+# [Popper](https://cosmo-design.github.io/popper/)
 
-[![npm version](https://img.shields.io/npm/v/popflow?logo=npm)](https://github.com/popflow/popflow) 
-[![npm version](https://img.badgesize.io/https:/unpkg.com/popflow/dist/index.min.js?compression=gzip)](https://github.com/popflow/popflow) 
+[![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
+[![npm version](https://img.badgesize.io/https:/unpkg.com/@cosmo-design/popper/dist/index.min.js?compression=gzip)](https://github.com/cosmo-design/popper) 
 
-PopFlow 是一个体积小，功能轻大的弹出工具库，它可以自动定位到 Trigger 附近合适的位置。同时它还支持虚拟元素，可以在 canvas 元素中使用，和 CSS 类动画。
+Popper 是一个体积小，功能轻大的弹出工具库，它可以自动定位到 Trigger 附近合适的位置。同时它还支持虚拟元素，可以在 canvas 元素中使用，和 CSS 类动画。
 
-[在线体验](https://popflow.github.io/popflow/)
+[在线体验](https://cosmo-design.github.io/popper/)
 
-[![PopFlow](./demo/p.png)](https://popflow.github.io/popflow/)
+[![@cosmo-design/popper](./demo/p.png)](https://cosmo-design.github.io/popper/)
 
 [English](./README_zh.md)
 
 ## 安装
 
 ```
-npm i popflow
+npm i @cosmo-design/popper
 ```
 
 或者通过 CDN 使用
 
 ```html
-<script src="https://unpkg.com/popflow@latest/dist/index.min.js"></script>
+<script src="https://unpkg.com/@cosmo-design/popper@latest/dist/index.min.js"></script>
 <script>
-  console.log(popflow)
+  console.log(popper)
 </script>
 ```
 
 ## 快速开始
 
 ```js
-import { Popflow } from 'popflow'
+import Popper from '@cosmo-design/popper'
 
 const container = document.querySelector('.container'); // 默认: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -38,24 +38,24 @@ const trigger = document.querySelector('.trigger');
 const content = document.createElement('div'); // 你需要弹出显示的内容
 content.classList.add('content');
 
-const popflow = new Popflow({
+const popper = new Popper({
   container,
   trigger, // 必填
   content, // 必填
 })
 
 trigger.onclick = () => {
-  popflow.toggle()
+  popper.toggle()
   // 或者
-  // if (popflow.opening) {
-  //   popflow.close();
+  // if (popper.opening) {
+  //   popper.close();
   // } else {
-  //   popflow.open();
+  //   popper.open();
   // }
 }
 
-// 如果你不需要 popflow
-popflow.destroy()
+// 如果你不需要 popper
+popper.destroy()
 ```
 
 ### CSS 动画
@@ -63,12 +63,12 @@ popflow.destroy()
 通过 `cssName` 参数可以在弹出层显示和隐藏时，添加 CSS 动画。
 
 ```js
-const popflow = new PopFlow({
+const popper = new Popper({
   cssName: 'fade'
 })
 ```
 
-PopFlow 会通过 `cssName` 添加下面 6 个类。
+Popper 会通过 `cssName` 添加下面 6 个类。
 
 ```js
 `${cssName}-enter-from` // 开始显示，下一帧被移除
@@ -99,7 +99,7 @@ PopFlow 会通过 `cssName` 添加下面 6 个类。
 const arrow = document.createElement('div')
 arrow.classList.add('arrow')
 
-const popflow = new PopFlow({
+const popper = new Popper({
   arrow
 })
 ```
@@ -112,6 +112,16 @@ const popflow = new PopFlow({
   transform-origin: center;
   background: #000;
 }
+```
+
+或者通过内置的 `createArrow` 函数来快速创建 `arrow`。
+
+```ts
+import Popper, { createArrow } from '@cosmo-design/popper' 
+
+const popper = new Popper({
+  arrow: createArrow({ background: '#000' })
+})
 ```
 
 ### 滚动
@@ -130,10 +140,10 @@ const popflow = new PopFlow({
 
 ### 钩子
 
-PopFlow 提供了丰富的钩子函数，可以在弹出层的各个生命周期执行代码。
+Popper 提供了丰富的钩子函数，可以在弹出层的各个生命周期执行代码。
 
 ```js
-new PopFlow({
+new Popper({
   onBeforeEnter() {
     // css 展示动画开始前
   },
@@ -166,10 +176,10 @@ new PopFlow({
 
 ### 虚拟元素
 
-`trigger` 参数除了是 DOM 元素之外，还可以是一个虚拟元素。这样你就可以在 canvas 中使用。当 canvas 中发生滚动时，你可以手动调用 `popflow.onScroll()` 方法来触发弹出层滚动。
+`trigger` 参数除了是 DOM 元素之外，还可以是一个虚拟元素。这样你就可以在 canvas 中使用。当 canvas 中发生滚动时，你可以手动调用 `popper.onScroll()` 方法来触发弹出层滚动。
 
 ```js
-const popflow = new PopFlow({
+const popper = new Popper({
   trigger: {
     getBoundingClientRect() {
       return {
@@ -182,7 +192,7 @@ const popflow = new PopFlow({
   }
 })
 
-canvas.on('scroll', () => popflow.onScroll())
+canvas.on('scroll', () => popper.onScroll())
 ```
 
 ## API
@@ -218,7 +228,7 @@ canvas.on('scroll', () => popflow.onScroll())
 | 参数 | 类型 | 描述 |
 | -- | -- | -- |
 | `el` | `HTMLElement` | 弹出层元素 |
-| `config` | `PopFlowConfig` | PopFlow 配置参数 |
+| `config` | `PopperConfig` | Popper 配置参数 |
 | `opening` | `boolean` | 当前弹出层是否显示 |
 | `isAnimation` | `boolean` | 当前是否在进行 css 动画 |
 
@@ -248,9 +258,17 @@ close(): void;
 toggle(): void;
 ```
 
+#### updateConfig()
+
+更新参数。
+
+```ts
+updateConfig(config: Partial<PopperConfig>): void;
+```
+
 #### destroy()
 
-销毁 popflow 实例
+销毁 popper 实例
 
 ```ts
 destroy(): void;
@@ -270,4 +288,24 @@ onScroll(): void;
 
 ```ts
 update(): void;
+```
+
+### 工具方法
+
+popper 还提供了快速创建 `arrow` 的工具方法。
+
+```ts
+import Popper, { createArrow } from '@cosmo-design/popper'
+
+new Popper({
+  arrow: createArrow()
+})
+```
+
+#### createArrow()
+
+快速创建 `arrow` DOM 元素，可接受 css 样式对象和类名作为参数。
+
+```ts
+createArrow(style?: CSSStyleDeclaration, className?: string): HTMLElement;
 ```

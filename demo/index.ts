@@ -1,4 +1,4 @@
-import { PopFlow, createArrow, PLACEMENT } from '../src';
+import { Popper, createArrow, PLACEMENT } from '../src';
 
 window.onload = function () {
   const container = document.querySelector('.container')! as HTMLElement;
@@ -30,7 +30,7 @@ window.onload = function () {
     cssName: 'fade',
     placement: PLACEMENT.T,
   };
-  const popup = new PopFlow(config as any);
+  const popup = new Popper(config as any);
   popup.open();
 
   const update = () => {

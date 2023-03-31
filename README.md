@@ -1,35 +1,35 @@
-# [PopFlow](https://popflow.github.io/popflow/)
+# [Popper](https://cosmo-design.github.io/popper/)
 
-[![npm version](https://img.shields.io/npm/v/popflow?logo=npm)](https://github.com/popflow/popflow) 
-[![npm version](https://img.badgesize.io/https:/unpkg.com/popflow/dist/index.min.js?compression=gzip)](https://github.com/popflow/popflow) 
+[![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
+[![npm version](https://img.badgesize.io/https:/unpkg.com/@cosmo-design/popper/dist/index.min.js?compression=gzip)](https://github.com/cosmo-design/popper) 
 
-PopFlow is a small yet powerful pop-up tool library that can automatically pop up at a suitable position adjacent to the trigger. It also supports virtual elements, which can be used in canvas and CSS class animations.
+Popper is a small yet powerful pop-up tool library that can automatically pop up at a suitable position adjacent to the trigger. It also supports virtual elements, which can be used in canvas and CSS class animations.
 
-[Playground](https://popflow.github.io/popflow/)
+[Playground](https://cosmo-design.github.io/popper/)
 
-[![PopFlow](./demo/p.png)](https://popflow.github.io/popflow/)
+[![@cosmo-design/popper](./demo/p.png)](https://cosmo-design.github.io/popper/)
 
 [中文文档](./README_zh.md)
 
 ## Install
 
 ```
-npm i popflow
+npm i @cosmo-design/popper
 ```
 
 or via CDN
 
 ```html
-<script src="https://unpkg.com/popflow@latest/dist/index.min.js"></script>
+<script src="https://unpkg.com/@cosmo-design/popper@latest/dist/index.min.js"></script>
 <script>
-  console.log(popflow)
+  console.log(popper)
 </script>
 ```
 
 ## Usage
 
 ```js
-import { PopFlow } from 'popflow'
+import Popper from '@cosmo-design/popper'
 
 const container = document.querySelector('.container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -38,24 +38,24 @@ const trigger = document.querySelector('.trigger');
 const content = document.createElement('div'); // You need to pop up the displayed content
 content.classList.add('content');
 
-const popflow = new PopFlow({
+const popper = new Popper({
   container,
   trigger, // required
   content, // required
 })
 
 trigger.onclick = () => {
-  popflow.toggle()
+  popper.toggle()
   // or
-  // if (popflow.opening) {
-  //   popflow.close();
+  // if (popper.opening) {
+  //   popper.close();
   // } else {
-  //   popflow.open();
+  //   popper.open();
   // }
 }
 
 // if you don't need it anymore
-popflow.destroy()
+popper.destroy()
 ```
 
 ### CSS Animation
@@ -63,12 +63,12 @@ popflow.destroy()
 The cssName parameter allows you to add CSS animations when showing and hiding a pop-up layer.
 
 ```js
-const popflow = new PopFlow({
+const popper = new Popper({
   cssName: 'fade'
 })
 ```
 
-PopFlow will add the following 6 classes through the cssName.
+Popper will add the following 6 classes through the cssName.
 
 ```js
 `${cssName}-enter-from` // Starts displaying and is removed in the next frame.
@@ -99,7 +99,7 @@ The arrow parameter allows you to add a custom arrow element.
 const arrow = document.createElement('div')
 arrow.classList.add('arrow')
 
-const popflow = new PopFlow({
+const popper = new Popper({
   arrow
 })
 ```
@@ -112,6 +112,16 @@ const popflow = new PopFlow({
   transform-origin: center;
   background: #000;
 }
+```
+
+Alternatively, an arrow can be quickly created using the built-in `createArrow` function.
+
+```ts
+import Popper, { createArrow } from '@cosmo-design/popper' 
+
+const popper = new Popper({
+  arrow: createArrow({ background: '#000' })
+})
 ```
 
 ### Scroll
@@ -130,10 +140,10 @@ The autoPlacement parameter controls whether the pop-up layer's position is auto
 
 ### Hook
 
-PopFlow provides rich hook functions that can execute code during various stages of the pop-up layer's lifecycle.
+Popper provides rich hook functions that can execute code during various stages of the pop-up layer's lifecycle.
 
 ```js
-new PopFlow({
+new Popper({
   onBeforeEnter() {
     // Executed before the CSS display animation starts.
   },
@@ -166,10 +176,10 @@ new PopFlow({
 
 ### Virtual Element
 
-The trigger parameter can be a virtual element in addition to a DOM element. This allows you to use PopFlow with canvas. When the canvas is scrolled, you can manually call the `popflow.onScroll()` method to trigger the pop-up layer to scroll.
+The trigger parameter can be a virtual element in addition to a DOM element. This allows you to use Popper with canvas. When the canvas is scrolled, you can manually call the `popper.onScroll()` method to trigger the pop-up layer to scroll.
 
 ```js
-const popflow = new PopFlow({
+const popper = new Popper({
   trigger: {
     getBoundingClientRect() {
       return {
@@ -182,7 +192,7 @@ const popflow = new PopFlow({
   }
 })
 
-canvas.on('scroll', () => popflow.onScroll())
+canvas.on('scroll', () => popper.onScroll())
 ```
 
 ## API
@@ -218,7 +228,7 @@ canvas.on('scroll', () => popflow.onScroll())
 | Name | Type | Description |
 | -- | -- | -- |
 | `el` | `HTMLElement` | The pop-up layer element |
-| `config` | `PopFlowConfig` | PopFlow configuration object |
+| `config` | `PopperConfig` | Popper configuration object |
 | `opening` | `boolean` | Indicates whether the pop-up layer is currently displayed |
 | `isAnimation` | `boolean` | Indicates whether a CSS animation is currently in progress |
 
@@ -226,7 +236,7 @@ canvas.on('scroll', () => popflow.onScroll())
 
 #### open()
 
-Open the PopFlow instance.
+Open the Popper instance.
 
 ```ts
 open(): void;
@@ -234,7 +244,7 @@ open(): void;
 
 #### close()
 
-Close the PopFlow instance.
+Close the Popper instance.
 
 ```ts
 close(): void;
@@ -242,15 +252,23 @@ close(): void;
 
 #### toggle()
 
-Toggle the PopFlow instance open or close.
+Toggle the Popper instance open or close.
 
 ```ts
 toggle(): void;
 ```
 
+#### updateConfig()
+
+Update config.
+
+```ts
+updateConfig(config: Partial<PopperConfig>): void;
+```
+
 #### destroy()
 
-Destroy the PopFlow instance.
+Destroy the Popper instance.
 
 ```ts
 destroy(): void;
@@ -266,8 +284,28 @@ onScroll(): void;
 
 #### update()
 
-Manually update the position of the PopFlow instance.
+Manually update the position of the Popper instance.
 
 ```ts
 update(): void;
+```
+
+### Utils
+
+Popper also provides utility methods for quickly creating `arrow` elements.
+
+```ts
+import Popper, { createArrow } from '@cosmo-design/popper'
+
+new Popper({
+  arrow: createArrow()
+})
+```
+
+#### createArrow()
+
+Quickly create `arrow` DOM elements that can accept CSS style objects and class names as parameters.
+
+```ts
+createArrow(style?: CSSStyleDeclaration, className?: string): HTMLElement;
 ```
