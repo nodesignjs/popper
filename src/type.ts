@@ -1,4 +1,4 @@
-import type { PLACEMENT } from './constant';
+import type { EmitType, PLACEMENT } from './constant';
 
 export interface Position {
   position: PLACEMENT,
@@ -8,6 +8,12 @@ export interface Position {
 export type Rect = { left: number, top: number, width: number, height: number }
 export interface PopperConfig {
   content: Element;
+  emit?: EmitType,
+  clickOutsideClose?: boolean;
+  openDelay?: number;
+  closeDelay?: number;
+  open?: boolean;
+  enterable?: boolean;
   container?: HTMLElement;
   trigger: { getBoundingClientRect: () => Rect } | Element;
   arrow?: Element;
@@ -28,6 +34,7 @@ export interface PopperConfig {
   onBeforePosition?: (pos: Position) => void;
   onOpen?: () => void;
   onClose?: () => void;
+  onClickOutside?: () => void;
 }
 export interface CssName {
   enterFrom: string,

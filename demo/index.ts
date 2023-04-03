@@ -1,4 +1,6 @@
-import { Popper, createArrow, PLACEMENT } from '../src';
+import {
+  Popper, createArrow, PLACEMENT, EmitType,
+} from '../src';
 
 window.onload = function () {
   const container = document.querySelector('.container')! as HTMLElement;
@@ -12,9 +14,9 @@ window.onload = function () {
   c.scrollTop = (2000 - cbb.height) / 2 + 10;
   c.scrollLeft = (2000 - cbb.width) / 2 + 10;
 
-  btn.onclick = () => {
-    popup.toggle();
-  };
+  // btn.onclick = () => {
+  //   popup.toggle();
+  // };
 
   const arrow = createArrow(undefined, 'arrow');
 
@@ -29,9 +31,12 @@ window.onload = function () {
     arrow,
     cssName: 'fade',
     placement: PLACEMENT.T,
+    openDelay: 0,
+    closeDelay: 50,
+    emit: EmitType.CLICK,
+    open: true,
   };
   const popup = new Popper(config as any);
-  popup.open();
 
   const update = () => {
     popup.updateConfig(config);
@@ -52,11 +57,16 @@ window.onload = function () {
     } else if (name === 'placement') {
       config.placement = value;
       update();
+    } else if (name === 'emit') {
+      config.emit = value || undefined;
+      update();
     }
   };
 
   const transXs = document.querySelector('.translate-x-s') as HTMLElement;
   const transYs = document.querySelector('.translate-y-s') as HTMLElement;
+  const openD = document.querySelector('.open-delay') as HTMLElement;
+  const closeD = document.querySelector('.close-delay') as HTMLElement;
 
   selection.oninput = ({ target }) => {
     const { name, value } = target as any;
@@ -67,6 +77,14 @@ window.onload = function () {
     } else if (name === 'translateY') {
       transYs.textContent = `${value}px`;
       config.translate = [config.translate[0], Number(value)];
+      update();
+    } else if (name === 'openDelay') {
+      openD.textContent = `${value}ms`;
+      config.openDelay = Number(value);
+      update();
+    } else if (name === 'closeDelay') {
+      closeD.textContent = `${value}ms`;
+      config.closeDelay = Number(value);
       update();
     }
   };

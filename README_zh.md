@@ -29,7 +29,7 @@ npm i @cosmo-design/popper
 ## 快速开始
 
 ```js
-import Popper from '@cosmo-design/popper'
+import Popper, { PLACEMENT, EmitType } from '@cosmo-design/popper'
 
 const container = document.querySelector('.container'); // 默认: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -42,6 +42,8 @@ const popper = new Popper({
   container,
   trigger, // 必填
   content, // 必填
+  placement: PLACEMENT.T, // 设置弹框位置
+  emit: EmitType.HOVER // 设置鼠标 hover 在 trigger 上时打开弹框
 })
 
 trigger.onclick = () => {
@@ -199,29 +201,36 @@ canvas.on('scroll', () => popper.onScroll())
 
 ### 配置
 
-| 参数 | 类型 | 描述 |
-| -- | -- | -- |
-| `container` | `HTMLElement` | 弹出层的容器，默认值： `document.body` |
-| `content` | `Element` | 要弹出的内容元素 |
-| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | 触发元素 |
-| `arrow` | `Element` | 箭头元素 |
-| `placement` | `PLACEMENT` | 弹出层的位置。默认：`'t'` |
-| `translate` | `[number, number]` | 自定义 xy 偏移量 |
-| `autoPlacement` | `boolean` | 自动切换位置，当空间不足。默认：`true` |
-| `autoUpdate` | `boolean` | 容器，内容，触发元素大小变化自动更新位置。默认：`true` |
-| `autoScroll` | `boolean` | 自动跟随滚动。默认：`true` |
-| `cssName` | `string` | css 动画类名 |
-| `overflowHidden` | `boolean` | 容器是否 overflow hidden，默认自动检测 |
-| `coverTrigger` | `boolean` | 弹出层是否覆盖 trigger 元素 |
-| `closeOnScroll` | `boolean` | 是否在滚动时自动关闭 |
-| `hideOnInvisible` | `boolean` | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 |
-| `onBeforeEnter` | `() => void` | css 进入动画开始之前 |
-| `onEntered` | `() => void` | css 进入动画完成时 |
-| `onBeforeExit` | `() => void` | css 关闭动画开始之前 |
-| `onExited` | `() => void` | css 关闭动画完成 |
-| `onBeforePosition` | `(pos: Position) => void` | 在设置弹出层位置之前，你可以修改 pos 对象，来设置最终弹出层位置 |
-| `onOpen` | `() => void` | 当弹出层展示 |
-| `onClose` | `() => void` | 当弹出层关闭 |
+| 参数 | 类型 | 默认 | 描述 |
+| -- | -- | -- | -- |
+| `container` | `HTMLElement` | `document.body` | 弹出层的容器 |
+| `content` | `Element` | | 要弹出的内容元素 |
+| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | 触发元素 |
+| `arrow` | `Element` | | 箭头元素 |
+| `placement` | `PLACEMENT` | `PLACEMENT.T` | 弹出层的位置 |
+| `translate` | `[number, number]` | `[0, 0]` | 自定义 xy 偏移量 |
+| `autoPlacement` | `boolean` | `true` | 自动切换位置，当空间不足 |
+| `autoUpdate` | `boolean` | `true` | 容器，内容，触发元素大小变化自动更新位置 |
+| `autoScroll` | `boolean` | `true` | 自动跟随滚动 |
+| `cssName` | `string` | | css 动画类名 |
+| `emit` | `EmitType` |  | 触发弹出类型 |
+| `clickOutsideClose` | `boolean` | `true` | 点击外部自动关闭弹出 |
+| `openDelay` | `number` | | 打开延迟 |
+| `closeDelay` | `number` | `50` | 关闭延迟 |
+| `open` | `boolean` | | 走来是否默认开启 |
+| `enterable` | `boolean` | `true` | 当 `emit` 等于 `hover` 时，鼠标是否可进入弹出层 |
+| `overflowHidden` | `boolean` | 自动检测 | 容器是否 overflow hidden |
+| `coverTrigger` | `boolean` | | 弹出层是否覆盖 trigger 元素 |
+| `closeOnScroll` | `boolean` | | 是否在滚动时自动关闭 |
+| `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 |
+| `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |
+| `onEntered` | `() => void` | | css 进入动画完成时 |
+| `onBeforeExit` | `() => void` | | css 关闭动画开始之前 |
+| `onExited` | `() => void` | | css 关闭动画完成 |
+| `onBeforePosition` | `(pos: Position) => void` | | 在设置弹出层位置之前，你可以修改 pos 对象，来设置最终弹出层位置 |
+| `onOpen` | `() => void` | | 当弹出层展示 |
+| `onClose` | `() => void` | | 当弹出层关闭 |
+| `onClickOutside` | `() => void` | | 当弹出层关闭 |
 
 ### 属性
 
@@ -230,7 +239,7 @@ canvas.on('scroll', () => popper.onScroll())
 | `el` | `HTMLElement` | 弹出层元素 |
 | `config` | `PopperConfig` | Popper 配置参数 |
 | `opening` | `boolean` | 当前弹出层是否显示 |
-| `isAnimation` | `boolean` | 当前是否在进行 css 动画 |
+| `isAnimating` | `boolean` | 当前是否在进行 css 动画 |
 
 ### 方法
 
@@ -256,6 +265,22 @@ close(): void;
 
 ```ts
 toggle(): void;
+```
+
+#### openWithDelay()
+
+在 `config.openDelay` 时间之后，打开弹出层
+
+```ts
+openWithDelay(): void;
+```
+
+### closeWithDelay()
+
+在 `config.closeDelay` 时间之后，关闭弹出层
+
+```ts
+closeWithDelay(): void;
 ```
 
 #### updateConfig()

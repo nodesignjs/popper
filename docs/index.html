@@ -134,7 +134,7 @@
       opacity: .6;
     }
   </style>
-  <script type="module" crossorigin src="./assets/index.59cac429.js"></script>
+  <script type="module" crossorigin src="./assets/index.e9defbe1.js"></script>
   <script type="module">try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;</script>
   <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy build because dynamic import or import.meta.url is unsupported, syntax error above should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
 </head>
@@ -165,13 +165,25 @@
         <label><input type="checkbox" name="cb" value="autoUpdate" checked /> autoUpdate</label>
         <label><input type="checkbox" name="cb" value="autoScroll" checked /> autoScroll</label>
         <label><input type="checkbox" name="cb" value="css" checked /> css animation</label>
+        <label><input type="checkbox" name="cb" value="clickOutsideClose" checked /> clickOutsideClose</label>
+        <label><input type="checkbox" name="cb" value="enterable" checked /> enterable</label>
         <label><input type="checkbox" name="cb" value="coverTrigger" /> coverTrigger</label>
         <label><input type="checkbox" name="cb" value="closeOnScroll" /> closeOnScroll</label>
         <label><input type="checkbox" name="cb" value="hideOnInvisible" /> hideOnInvisible</label>
       </div>
+      <div>
+        <span>emit: </span>
+        <label><input type="radio" name="emit" value="hover">hover</label>
+        <label><input type="radio" name="emit" value="click" checked>click</label>
+        <label><input type="radio" name="emit" value="">none</label>
+      </div>
       <div style="display:flex;align-items: center;justify-content: center;flex-wrap: wrap;">
         <label style="flex: 1">translateX <input type="range" name="translateX" min="-100" max="100" value="0" /><span class="translate-x-s">0px</span></label>
         <label style="flex: 1">translateY <input type="range" name="translateY" min="-100" max="100" value="-10" /><span class="translate-y-s">-10px</span></label>
+      </div>
+      <div style="display:flex;align-items: center;justify-content: center;flex-wrap: wrap;">
+        <label style="flex: 1">openDelay <input type="range" name="openDelay" min="0" max="3000" value="0" /><span class="open-delay">0ms</span></label>
+        <label style="flex: 1">closeDelay <input type="range" name="closeDelay" min="0" max="3000" value="50" /><span class="close-delay">50ms</span></label>
       </div>
       <div>
         <fieldset>
@@ -203,6 +215,6 @@
   
   <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
   <script nomodule crossorigin id="vite-legacy-polyfill" src="./assets/polyfills-legacy.a8f466b9.js"></script>
-  <script nomodule crossorigin id="vite-legacy-entry" data-src="./assets/index-legacy.d3780c9b.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+  <script nomodule crossorigin id="vite-legacy-entry" data-src="./assets/index-legacy.8ddbc442.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
 </body>
 </html>

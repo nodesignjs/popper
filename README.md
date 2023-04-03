@@ -29,7 +29,7 @@ or via CDN
 ## Usage
 
 ```js
-import Popper from '@cosmo-design/popper'
+import Popper, { PLACEMENT, EmitType } from '@cosmo-design/popper'
 
 const container = document.querySelector('.container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -42,6 +42,8 @@ const popper = new Popper({
   container,
   trigger, // required
   content, // required
+  placement: PLACEMENT.T, // Set the position of the popper
+  emit: EmitType.HOVER // Set to open the popper when the mouse hovers over the trigger
 })
 
 trigger.onclick = () => {
@@ -199,29 +201,36 @@ canvas.on('scroll', () => popper.onScroll())
 
 ### Config
 
-| Name | Type | Description |
-| -- | -- | -- |
-| `container` | `HTMLElement` | The container of the popup. Default value: `document.body`. |
-| `content` | `Element` | The content element to be popped up |
-| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | The trigger element |
-| `arrow` | `Element` | The arrow element. |
-| `placement` | `PLACEMENT` | The placement of the popup. Default: 't'. |
-| `translate` | `[number, number]` | The custom xy offset. |
-| `autoPlacement` | `boolean` | Whether to automatically switch the position when there is not enough space. Default: `true`. |
-| `autoUpdate` | `boolean` | Whether to automatically update the position when the container, content, or trigger size changes. Default: `true`. |
-| `autoScroll` | `boolean` | Whether to automatically follow the trigger element when it is scrolled. Default: `true`. |
-| `cssName` | `string` | The CSS animation class name. |
-| `overflowHidden` | `boolean` | Whether the container has overflow hidden. Default: automatically detected. |
-| `coverTrigger` | `boolean` | Whether to cover the trigger element with the popup. |
-| `closeOnScroll` | `boolean` | Whether to automatically close the popup when the trigger element is scrolled. |
-| `hideOnInvisible` | `boolean` | Whether to automatically hide the popup when the trigger element is invisible on the screen. |
-| `onBeforeEnter` | `() => void` | Called before the CSS enter animation starts. |
-| `onEntered` | `() => void` | 	Called when the CSS enter animation ends. |
-| `onBeforeExit` | `() => void` | Called before the CSS exit animation starts. |
-| `onExited` | `() => void` | Called when the CSS exit animation ends. |
-| `onBeforePosition` | `(pos: Position) => void` | Called before setting the position of the popup. You can modify the pos object to set the final position of the popup. |
-| `onOpen` | `() => void` | Called when the popup is opened. |
-| `onClose` | `() => void` | Called when the popup is closed. |
+| Name | Type | Default | Description |
+| -- | -- | -- | -- |
+| `container` | `HTMLElement` | `document.body` | The container of the popper. |
+| `content` | `Element` | | The content element to be popped up |
+| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | The trigger element |
+| `arrow` | `Element` | | The arrow element. |
+| `placement` | `PLACEMENT` | `PLACEMENT.T` | The placement of the popper. |
+| `translate` | `[number, number]` | `[0, 0]` | The custom xy offset. |
+| `autoPlacement` | `boolean` | `true` | Whether to automatically switch the position when there is not enough space. |
+| `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the container, content, or trigger size changes. |
+| `autoScroll` | `boolean` | `true` | Whether to automatically follow the trigger element when it is scrolled. |
+| `cssName` | `string` | | The CSS animation class name. |
+| `emit` | `EmitType` |  | Trigger emit type |
+| `clickOutsideClose` | `boolean` | `true` | Automatically close the popper when clicking outside |
+| `openDelay` | `number` | | Open delay |
+| `closeDelay` | `number` | `50` | Close delay |
+| `open` | `boolean` | | Is it enabled by default |
+| `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popper |
+| `overflowHidden` | `boolean` | automatically detected | Whether the container has overflow hidden. |
+| `coverTrigger` | `boolean` | | Whether to cover the trigger element with the popper. |
+| `closeOnScroll` | `boolean` | | Whether to automatically close the popper when the trigger element is scrolled. |
+| `hideOnInvisible` | `boolean` | | Whether to automatically hide the popper when the trigger element is invisible on the screen. |
+| `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
+| `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
+| `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |
+| `onExited` | `() => void` | | Called when the CSS exit animation ends. |
+| `onBeforePosition` | `(pos: Position) => void` | | Called before setting the position of the popper. You can modify the pos object to set the final position of the popper. |
+| `onOpen` | `() => void` | | Called when the popper is opened. |
+| `onClose` | `() => void` | |Called when the popper is closed. |
+| `onClickOutside` | `() => void` | | When the popper is closed. |
 
 ### Property
 
@@ -230,7 +239,7 @@ canvas.on('scroll', () => popper.onScroll())
 | `el` | `HTMLElement` | The pop-up layer element |
 | `config` | `PopperConfig` | Popper configuration object |
 | `opening` | `boolean` | Indicates whether the pop-up layer is currently displayed |
-| `isAnimation` | `boolean` | Indicates whether a CSS animation is currently in progress |
+| `isAnimating` | `boolean` | Indicates whether a CSS animation is currently in progress |
 
 ### Methods
 
@@ -256,6 +265,22 @@ Toggle the Popper instance open or close.
 
 ```ts
 toggle(): void;
+```
+
+#### openWithDelay()
+
+Open the popper after `config.openDelay` time.
+
+```ts
+openWithDelay(): void;
+```
+
+### closeWithDelay()
+
+Close the popper after `config.closeDelay` time.
+
+```ts
+closeWithDelay(): void;
 ```
 
 #### updateConfig()

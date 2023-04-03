@@ -4,7 +4,7 @@ import {
 import type {
   Position, Rect, PopperConfig, CssName, TransitionInfo,
 } from './type';
-import { PLACEMENT } from './constant';
+import { EmitType, PLACEMENT } from './constant';
 
 function getConfig(config: PopperConfig) {
   return {
@@ -14,6 +14,9 @@ function getConfig(config: PopperConfig) {
     autoUpdate: true,
     autoScroll: true,
     translate: [0, 0],
+    clickOutsideClose: true,
+    enterable: true,
+    closeDelay: 50,
     ...config,
   } as PopperConfig;
 }
@@ -39,6 +42,8 @@ export class Popper implements Destroyable {
   opening = false;
 
   isAnimating = false;
+
+  private closed = true;
 
   private cel: HTMLElement;
 
@@ -68,16 +73,23 @@ export class Popper implements Destroyable {
 
   private ro?: ResizeObserver;
 
+  private openTimer?: any;
+
+  private closeTimer?: any;
+
   constructor(config: PopperConfig) {
     const oldContainer = config.container;
     config = this.config = getConfig(config);
+
     this.cel = $();
     const { style } = this.cel;
     style.position = 'absolute';
     style.left = style.top = '0';
+
     const {
       content, container, trigger,
     } = config;
+
     const info = getContainerInfo(container!);
     if (config.overflowHidden == null) config.overflowHidden = info.clip;
     if (oldContainer && !info.position || info.position === 'static') {
@@ -88,12 +100,7 @@ export class Popper implements Destroyable {
     this.el.appendChild(content);
 
     this.isTriggerEl = trigger instanceof Element;
-    if (config.autoUpdate) {
-      const ro = this.ro = new ResizeObserver(() => this.update());
-      ro.observe(this.el);
-      ro.observe(container!);
-      if (this.isTriggerEl) ro.observe(trigger as HTMLElement);
-    }
+    if (config.autoUpdate) this.observe();
 
     if (this.needListenScroll()) {
       this.scrollEls = getScrollElements(trigger as HTMLElement, container!);
@@ -106,6 +113,10 @@ export class Popper implements Destroyable {
     }
 
     this.setCssName();
+    this.addTriEv();
+    this.addEnterEv();
+
+    if (config.open) this.open();
   }
 
   update() {
@@ -122,6 +133,14 @@ export class Popper implements Destroyable {
           this.el.removeChild(o as HTMLElement);
           if (n) this.el.appendChild(n as HTMLElement);
           break;
+        case 'emit':
+          if (this.isTriggerEl) {
+            this.removeEmitEv();
+            if (n) this.addTriEv();
+          }
+          this.removeEnterEv();
+          this.addEnterEv();
+          break;
         case 'container':
           if (!n) config.container = document.body;
           if (this.ro) {
@@ -129,13 +148,19 @@ export class Popper implements Destroyable {
             this.ro.observe(config.container as HTMLElement);
           }
           break;
+        case 'enterable':
+          this.removeEnterEv();
+          if (n) this.addEnterEv();
+          break;
         case 'trigger': {
           const oldIsTriggerEl = this.isTriggerEl;
+          if (oldIsTriggerEl) this.removeEmitEv(o as HTMLElement);
           this.isTriggerEl = n instanceof Element;
           if (this.ro) {
             if (oldIsTriggerEl) this.ro.unobserve(o as HTMLElement);
             if (this.isTriggerEl) this.ro.observe(n as HTMLElement);
           }
+          if (this.isTriggerEl) this.addTriEv();
           const need = this.needListenScroll();
           if (need) {
             if (!this.scrollEls) {
@@ -184,13 +209,7 @@ export class Popper implements Destroyable {
           break;
         case 'autoUpdate':
           if (n) {
-            if (!this.ro) {
-              const c = this.config;
-              const ro = this.ro = new ResizeObserver(() => this.update());
-              ro.observe(this.el);
-              ro.observe(c.container!);
-              if (this.isTriggerEl) ro.observe(c.trigger as HTMLElement);
-            }
+            if (!this.ro) this.observe();
           } else if (this.ro) {
             this.ro.disconnect();
             this.ro = undefined;
@@ -225,10 +244,14 @@ export class Popper implements Destroyable {
     this.isAnimating = true;
     this.opening = false;
     this.removeScrollEv();
+    this.removeDocClick();
+    this.removeEmitEv();
+    this.removeEnterEv();
     destroy(this);
   }
 
   open() {
+    this.closed = false;
     const {
       config, cssName, opening, el, arrowEl,
     } = this;
@@ -240,6 +263,7 @@ export class Popper implements Destroyable {
       this.scrollEls?.forEach((x) => {
         x.addEventListener('scroll', this.onScroll, { passive: true });
       });
+      document.addEventListener('click', this.onDocClick);
     }
     this.opening = true;
     const popBcr = el.getBoundingClientRect();
@@ -319,6 +343,7 @@ export class Popper implements Destroyable {
   }
 
   close() {
+    this.closed = true;
     if (this.isAnimating || !this.opening) return;
     this.opening = false;
 
@@ -343,7 +368,9 @@ export class Popper implements Destroyable {
     }
 
     this.removeScrollEv();
+    this.removeDocClick();
     if (onClose) onClose();
+    document.removeEventListener('click', this.onDocClick);
   }
 
   toggle() {
@@ -361,6 +388,115 @@ export class Popper implements Destroyable {
       this.update();
     }
   });
+
+  openWithDelay() {
+    this.clearOCTimer();
+    const { openDelay } = this.config;
+    if (openDelay) {
+      this.openTimer = setTimeout(() => {
+        this.open();
+      }, openDelay);
+    } else {
+      this.open();
+    }
+  }
+
+  closeWithDelay() {
+    this.clearOCTimer();
+    const { closeDelay } = this.config;
+    if (closeDelay) {
+      this.closeTimer = setTimeout(() => {
+        this.close();
+      }, closeDelay);
+    } else {
+      this.close();
+    }
+  }
+
+  private onTriClick = () => {
+    if (this.opening) {
+      this.closeWithDelay();
+    } else {
+      this.openWithDelay();
+    }
+  };
+
+  private onTriEnter = () => {
+    this.clearOCTimer();
+    if (this.opening) return;
+    this.openWithDelay();
+  };
+
+  private onTriLeave = () => {
+    this.clearOCTimer();
+    if (!this.opening) return;
+    this.closeWithDelay();
+  };
+
+  private clearOCTimer = () => {
+    clearTimeout(this.openTimer);
+    clearTimeout(this.closeTimer);
+  };
+
+  private removeDocClick = () => {
+    document.removeEventListener('click', this.onDocClick);
+  };
+
+  private removeEmitEv(el?: HTMLElement) {
+    el = el || (this.config.trigger as HTMLElement);
+    if (el instanceof Element) {
+      (el as HTMLElement).removeEventListener('click', this.onTriClick);
+      (el as HTMLElement).removeEventListener('mouseenter', this.onTriEnter);
+      (el as HTMLElement).removeEventListener('mouseleave', this.onTriLeave);
+    }
+  }
+
+  private onDocClick = ({ target }: MouseEvent) => {
+    const { onClickOutside, clickOutsideClose } = this.config;
+
+    if (onClickOutside || clickOutsideClose) {
+      if (
+        this.el?.contains((target as HTMLElement))
+        || (this.isTriggerEl && (this.config.trigger as HTMLElement)?.contains(target as HTMLElement))
+      ) return;
+      onClickOutside?.();
+      if (clickOutsideClose) this.closeWithDelay();
+    }
+  };
+
+  private observe() {
+    const { config } = this;
+    const ro = this.ro = new ResizeObserver(() => this.update());
+    ro.observe(this.el);
+    ro.observe(config.container!);
+    if (this.isTriggerEl) ro.observe(config.trigger as HTMLElement);
+  }
+
+  private addTriEv() {
+    const { config } = this;
+    if (this.isTriggerEl && config.emit) {
+      const { trigger } = config;
+      if (config.emit === EmitType.CLICK) {
+        (trigger as HTMLElement).addEventListener('click', this.onTriClick);
+      } else {
+        (trigger as HTMLElement).addEventListener('mouseenter', this.onTriEnter);
+        (trigger as HTMLElement).addEventListener('mouseleave', this.onTriLeave);
+      }
+    }
+  }
+
+  private addEnterEv() {
+    const { config } = this;
+    if (config.enterable && config.emit === EmitType.HOVER) {
+      this.cel.addEventListener('mouseenter', this.clearOCTimer);
+      this.cel.addEventListener('mouseleave', this.onTriLeave);
+    }
+  }
+
+  private removeEnterEv() {
+    this.cel.removeEventListener('mouseenter', this.clearOCTimer);
+    this.cel.removeEventListener('mouseleave', this.onTriLeave);
+  }
 
   private removeScrollEv() {
     this.scrollEls?.forEach((x) => x.removeEventListener('scroll', this.onScroll));
@@ -403,6 +539,7 @@ export class Popper implements Destroyable {
     removeClass(el, cssName!.enterTo);
     this.isAnimating = false;
     if (onEntered) onEntered();
+    if (this.closed) this.closeWithDelay();
   };
 
   private onHideTransitionEnd = () => {
@@ -413,6 +550,7 @@ export class Popper implements Destroyable {
     removeClass(el, cssName!.exitTo);
     this.isAnimating = false;
     if (onExited) onExited();
+    if (!this.closed) this.openWithDelay();
   };
 
   private needListenScroll() {

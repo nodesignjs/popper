@@ -12,3 +12,8 @@ export enum PLACEMENT {
   RT = 'rt',
   RB = 'rb'
 }
+
+export enum EmitType {
+  HOVER = 'hover',
+  CLICK = 'click'
+}

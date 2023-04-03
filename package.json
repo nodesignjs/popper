@@ -1,6 +1,6 @@
 {
   "name": "@cosmo-design/popper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.min.js",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
