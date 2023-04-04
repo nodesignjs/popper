@@ -218,6 +218,7 @@ canvas.on('scroll', () => popper.onScroll())
 | `openDelay` | `number` | | Open delay |
 | `closeDelay` | `number` | `50` | Close delay |
 | `open` | `boolean` | | Is it enabled by default |
+| `disabled` | `boolean` | | Disabled |
 | `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popper |
 | `overflowHidden` | `boolean` | automatically detected | Whether the container has overflow hidden. |
 | `coverTrigger` | `boolean` | | Whether to cover the trigger element with the popper. |
@@ -275,12 +276,28 @@ Open the popper after `config.openDelay` time.
 openWithDelay(): void;
 ```
 
-### closeWithDelay()
+#### closeWithDelay()
 
 Close the popper after `config.closeDelay` time.
 
 ```ts
 closeWithDelay(): void;
+```
+
+#### enable()
+
+Enable.
+
+```ts
+enable(): void
+```
+
+#### disable()
+
+Disable and close popper.
+
+```ts
+disable(): void
 ```
 
 #### updateConfig()

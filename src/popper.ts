@@ -199,7 +199,7 @@ export class Popper implements Destroyable {
           break;
         case 'arrow':
           if (this.arrowEl) {
-            this.arrowEl.removeChild(o as HTMLElement);
+            this.arrowEl.removeChild(o as Node);
             if (!n) {
               this.el.removeChild(this.arrowEl);
               this.arrowEl = undefined;
@@ -207,7 +207,7 @@ export class Popper implements Destroyable {
           }
           if (n) {
             this.arrowEl = this.arrowEl || createArrowWrapper();
-            this.arrowEl.appendChild(n as HTMLElement);
+            this.arrowEl.appendChild(n as Node);
             this.el.appendChild(this.arrowEl);
           }
           break;
@@ -255,6 +255,7 @@ export class Popper implements Destroyable {
   }
 
   open() {
+    if (this.config.disabled) return;
     this.closed = false;
     const {
       config, cssName, opening, el, arrowEl,
@@ -383,6 +384,15 @@ export class Popper implements Destroyable {
     } else {
       this.open();
     }
+  }
+
+  enable() {
+    this.config.disabled = false;
+  }
+
+  disable() {
+    this.config.disabled = true;
+    this.close();
   }
 
   onScroll = throttle(() => {

@@ -218,6 +218,7 @@ canvas.on('scroll', () => popper.onScroll())
 | `openDelay` | `number` | | 打开延迟 |
 | `closeDelay` | `number` | `50` | 关闭延迟 |
 | `open` | `boolean` | | 走来是否默认开启 |
+| `disabled` | `boolean` | | 是否禁用 |
 | `enterable` | `boolean` | `true` | 当 `emit` 等于 `hover` 时，鼠标是否可进入弹出层 |
 | `overflowHidden` | `boolean` | 自动检测 | 容器是否 overflow hidden |
 | `coverTrigger` | `boolean` | | 弹出层是否覆盖 trigger 元素 |
@@ -275,12 +276,28 @@ toggle(): void;
 openWithDelay(): void;
 ```
 
-### closeWithDelay()
+#### closeWithDelay()
 
 在 `config.closeDelay` 时间之后，关闭弹出层
 
 ```ts
 closeWithDelay(): void;
+```
+
+#### enable()
+
+启用弹出。
+
+```ts
+enable(): void
+```
+
+#### disable()
+
+禁用并关闭弹出。
+
+```ts
+disable(): void
 ```
 
 #### updateConfig()

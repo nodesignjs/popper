@@ -7,16 +7,17 @@ export interface Position {
 }
 export type Rect = { left: number, top: number, width: number, height: number }
 export interface PopperConfig {
-  content: Element;
+  content: Node;
   emit?: EmitType,
   clickOutsideClose?: boolean;
   openDelay?: number;
   closeDelay?: number;
   open?: boolean;
+  disabled?: boolean;
   enterable?: boolean;
   container?: HTMLElement;
   trigger: { getBoundingClientRect: () => Rect } | Element;
-  arrow?: Element;
+  arrow?: Node;
   placement?: PLACEMENT;
   translate?: number[];
   autoPlacement?: boolean;
