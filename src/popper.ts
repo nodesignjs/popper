@@ -35,9 +35,9 @@ export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
 }
 
 export class Popper implements Destroyable {
-  el: HTMLElement;
+  el!: HTMLElement;
 
-  config: PopperConfig;
+  config!: PopperConfig;
 
   opening = false;
 
@@ -45,7 +45,7 @@ export class Popper implements Destroyable {
 
   private closed = true;
 
-  private cel: HTMLElement;
+  private cel!: HTMLElement;
 
   private cssName?: CssName;
 
@@ -63,7 +63,7 @@ export class Popper implements Destroyable {
 
   private scrollEls?: HTMLElement[];
 
-  private isTriggerEl: boolean;
+  private isTriggerEl!: boolean;
 
   private arrowEl?: HTMLElement;
 
@@ -78,6 +78,10 @@ export class Popper implements Destroyable {
   private closeTimer?: any;
 
   constructor(config: PopperConfig) {
+    if (config) this.init(config);
+  }
+
+  protected init(config: PopperConfig) {
     const oldContainer = config.container;
     config = this.config = getConfig(config);
 
