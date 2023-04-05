@@ -243,7 +243,7 @@ export class Popper implements Destroyable {
           this.setCssName();
           break;
         case 'disabled':
-          if (!n) this.disable();
+          if (n) this.disable();
           break;
       }
     });
