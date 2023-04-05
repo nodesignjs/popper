@@ -18,6 +18,7 @@ export interface PopperConfig {
   container?: HTMLElement;
   trigger: { getBoundingClientRect: () => Rect } | Element;
   arrow?: Node;
+  triggerOpenClass?: string;
   placement?: PLACEMENT;
   translate?: number[];
   autoPlacement?: boolean;

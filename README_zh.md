@@ -49,7 +49,7 @@ const popper = new Popper({
 trigger.onclick = () => {
   popper.toggle()
   // 或者
-  // if (popper.opening) {
+  // if (popper.opened) {
   //   popper.close();
   // } else {
   //   popper.open();
@@ -204,8 +204,8 @@ canvas.on('scroll', () => popper.onScroll())
 | 参数 | 类型 | 默认 | 描述 |
 | -- | -- | -- | -- |
 | `container` | `HTMLElement` | `document.body` | 弹出层的容器 |
-| `content` | `Element` | | 要弹出的内容元素 |
-| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | 触发元素 |
+| `content` | `Element` | | 必填，要弹出的内容元素 |
+| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | 必填，触发元素 |
 | `arrow` | `Element` | | 箭头元素 |
 | `placement` | `PLACEMENT` | `PLACEMENT.T` | 弹出层的位置 |
 | `translate` | `[number, number]` | `[0, 0]` | 自定义 xy 偏移量 |
@@ -219,6 +219,7 @@ canvas.on('scroll', () => popper.onScroll())
 | `closeDelay` | `number` | `50` | 关闭延迟 |
 | `open` | `boolean` | | 走来是否默认开启 |
 | `disabled` | `boolean` | | 是否禁用 |
+| `triggerOpenClass` | `string` | | 弹窗开启时给 `trigger` 添加的 `class` |
 | `enterable` | `boolean` | `true` | 当 `emit` 等于 `hover` 时，鼠标是否可进入弹出层 |
 | `overflowHidden` | `boolean` | 自动检测 | 容器是否 overflow hidden |
 | `coverTrigger` | `boolean` | | 弹出层是否覆盖 trigger 元素 |
@@ -239,7 +240,7 @@ canvas.on('scroll', () => popper.onScroll())
 | -- | -- | -- |
 | `el` | `HTMLElement` | 弹出层元素 |
 | `config` | `PopperConfig` | Popper 配置参数 |
-| `opening` | `boolean` | 当前弹出层是否显示 |
+| `opened` | `boolean` | 当前弹出层是否显示 |
 | `isAnimating` | `boolean` | 当前是否在进行 css 动画 |
 
 ### 方法

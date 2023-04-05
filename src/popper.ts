@@ -39,7 +39,7 @@ export class Popper implements Destroyable {
 
   config!: PopperConfig;
 
-  opening = false;
+  opened = false;
 
   isAnimating = false;
 
@@ -124,7 +124,7 @@ export class Popper implements Destroyable {
   }
 
   update() {
-    if (this.opening && !this.isAnimating) this.open();
+    if (this.opened && !this.isAnimating) this.open();
   }
 
   updateConfig(config: Partial<PopperConfig>) {
@@ -152,19 +152,37 @@ export class Popper implements Destroyable {
             this.ro.observe(config.container as HTMLElement);
           }
           break;
+        case 'triggerOpenClass':
+          if (this.opened && this.isTriggerEl) {
+            const { trigger } = this.config;
+            if (o) removeClass(trigger as Element, o as string);
+            if (n) addClass(trigger as Element, n as string);
+          }
+          break;
         case 'enterable':
           this.removeEnterEv();
           if (n) this.addEnterEv();
           break;
         case 'trigger': {
           const oldIsTriggerEl = this.isTriggerEl;
-          if (oldIsTriggerEl) this.removeEmitEv(o as HTMLElement);
+          const { triggerOpenClass } = this.config;
+          if (oldIsTriggerEl) {
+            this.removeEmitEv(o as HTMLElement);
+            if (triggerOpenClass) {
+              removeClass(o as Element, triggerOpenClass);
+            }
+          }
           this.isTriggerEl = n instanceof Element;
           if (this.ro) {
             if (oldIsTriggerEl) this.ro.unobserve(o as HTMLElement);
             if (this.isTriggerEl) this.ro.observe(n as HTMLElement);
           }
-          if (this.isTriggerEl) this.addTriEv();
+          if (this.isTriggerEl) {
+            this.addTriEv();
+            if (this.opened && triggerOpenClass) {
+              addClass(o as Element, triggerOpenClass);
+            }
+          }
           const need = this.needListenScroll();
           if (need) {
             if (!this.scrollEls) {
@@ -185,7 +203,7 @@ export class Popper implements Destroyable {
               if (!this.scrollEls) {
                 const c = this.config;
                 this.scrollEls = getScrollElements(c.trigger! as HTMLElement, c.container!);
-                if (this.opening) {
+                if (this.opened) {
                   this.scrollEls?.forEach((x) => {
                     x.addEventListener('scroll', this.onScroll, { passive: true });
                   });
@@ -234,7 +252,7 @@ export class Popper implements Destroyable {
       this.ro.disconnect();
       this.ro = undefined;
     }
-    if (this.opening) {
+    if (this.opened) {
       try {
         container!.removeChild(this.cel);
       } catch (e) {
@@ -246,7 +264,7 @@ export class Popper implements Destroyable {
     this.clearShow?.();
     this.clearHide?.();
     this.isAnimating = true;
-    this.opening = false;
+    this.opened = false;
     this.removeScrollEv();
     this.removeDocClick();
     this.removeEmitEv();
@@ -258,10 +276,10 @@ export class Popper implements Destroyable {
     if (this.config.disabled) return;
     this.closed = false;
     const {
-      config, cssName, opening, el, arrowEl,
+      config, cssName, opened, el, arrowEl,
     } = this;
     const { container, trigger } = config;
-    const fromHide = !opening;
+    const fromHide = !opened;
     if (fromHide) {
       if (this.isAnimating) return;
       container!.appendChild(this.cel);
@@ -270,7 +288,7 @@ export class Popper implements Destroyable {
       });
       document.addEventListener('click', this.onDocClick);
     }
-    this.opening = true;
+    this.opened = true;
     const popBcr = el.getBoundingClientRect();
     const containerBcr = container!.getBoundingClientRect();
     const arrowBcr = arrowEl?.getBoundingClientRect();
@@ -283,6 +301,7 @@ export class Popper implements Destroyable {
         width: triggerBcr.width,
         height: triggerBcr.height,
       };
+      if (config.triggerOpenClass) addClass(trigger as Element, config.triggerOpenClass);
     }
 
     this.isAnimating = true;
@@ -349,8 +368,8 @@ export class Popper implements Destroyable {
 
   close() {
     this.closed = true;
-    if (this.isAnimating || !this.opening) return;
-    this.opening = false;
+    if (this.isAnimating || !this.opened) return;
+    this.opened = false;
 
     const { config, cssName, el } = this;
     const { onClose } = config;
@@ -372,6 +391,10 @@ export class Popper implements Destroyable {
       config.container!.removeChild(this.cel);
     }
 
+    if (this.isTriggerEl && config.triggerOpenClass) {
+      removeClass(config.trigger as Element, config.triggerOpenClass);
+    }
+
     this.removeScrollEv();
     this.removeDocClick();
     if (onClose) onClose();
@@ -379,7 +402,7 @@ export class Popper implements Destroyable {
   }
 
   toggle() {
-    if (this.opening) {
+    if (this.opened) {
       this.close();
     } else {
       this.open();
@@ -428,7 +451,7 @@ export class Popper implements Destroyable {
   }
 
   private onTriClick = () => {
-    if (this.opening) {
+    if (this.opened) {
       this.closeWithDelay();
     } else {
       this.openWithDelay();
@@ -437,13 +460,13 @@ export class Popper implements Destroyable {
 
   private onTriEnter = () => {
     this.clearOCTimer();
-    if (this.opening) return;
+    if (this.opened) return;
     this.openWithDelay();
   };
 
   private onTriLeave = () => {
     this.clearOCTimer();
-    if (!this.opening) return;
+    if (!this.opened) return;
     this.closeWithDelay();
   };
 

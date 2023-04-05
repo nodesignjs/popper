@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
 [![npm version](https://img.badgesize.io/https:/unpkg.com/@cosmo-design/popper/dist/index.min.js?compression=gzip)](https://github.com/cosmo-design/popper) 
 
-Popper is a small yet powerful pop-up tool library that can automatically pop up at a suitable position adjacent to the trigger. It also supports virtual elements, which can be used in canvas and CSS class animations.
+Popper is a small yet powerful popper library that can automatically pop up at a suitable position adjacent to the trigger. It also supports virtual elements, which can be used in canvas and CSS class animations.
 
 [Playground](https://cosmo-design.github.io/popper/)
 
@@ -49,7 +49,7 @@ const popper = new Popper({
 trigger.onclick = () => {
   popper.toggle()
   // or
-  // if (popper.opening) {
+  // if (popper.opened) {
   //   popper.close();
   // } else {
   //   popper.open();
@@ -62,7 +62,7 @@ popper.destroy()
 
 ### CSS Animation
 
-The cssName parameter allows you to add CSS animations when showing and hiding a pop-up layer.
+The cssName parameter allows you to add CSS animations when showing and hiding the popper.
 
 ```js
 const popper = new Popper({
@@ -128,21 +128,21 @@ const popper = new Popper({
 
 ### Scroll
 
-The autoScroll parameter controls whether the pop-up layer automatically scrolls with the trigger element when it is scrolled.
+The autoScroll parameter controls whether the popper automatically scrolls with the trigger element when it is scrolled.
 
-The closeOnScroll parameter controls whether the pop-up layer automatically closes when the trigger element is scrolled.
+The closeOnScroll parameter controls whether the popper automatically closes when the trigger element is scrolled.
 
-The hideOnInvisible parameter controls whether the pop-up layer automatically hides when the trigger element is not visible on the screen.
+The hideOnInvisible parameter controls whether the popper automatically hides when the trigger element is not visible on the screen.
 
 ### AutoUpdate
 
-The autoUpdate parameter controls whether the pop-up layer's position is automatically updated when the size of the container, content, or trigger element changes. This feature relies on the [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+The autoUpdate parameter controls whether the popper's position is automatically updated when the size of the container, content, or trigger element changes. This feature relies on the [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
 
-The autoPlacement parameter controls whether the pop-up layer's position is automatically adjusted to ensure that it is fully displayed when there is not enough space.
+The autoPlacement parameter controls whether the popper's position is automatically adjusted to ensure that it is fully displayed when there is not enough space.
 
 ### Hook
 
-Popper provides rich hook functions that can execute code during various stages of the pop-up layer's lifecycle.
+Popper provides rich hook functions that can execute code during various stages of the popper's lifecycle.
 
 ```js
 new Popper({
@@ -159,26 +159,26 @@ new Popper({
     // Executed after the CSS hide animation completes.
   },
   onBeforePosition(pos) {
-    // Executed before setting the pop-up layer's position.
+    // Executed before setting the popper's position.
     // pos.position: the final display position.
-    // pos.xy: the position of the pop-up layer, undefined means not displayed.
+    // pos.xy: the position of the popper, undefined means not displayed.
     // pos.arrowXY: the position of the arrow, undefined means not displayed.
     // You can modify xy and arrowXY directly to change the final position.
     if (pos.xy) pos.xy[0] += 10
     if (pos.arrowXY) pos.arrowXY[0] += 10
   },
   onOpen() {
-    // Executed when the pop-up layer is displayed.
+    // Executed when the popper is displayed.
   },
   onClose() {
-    // Executed when the pop-up layer is closed.
+    // Executed when the popper is closed.
   }
 })
 ```
 
 ### Virtual Element
 
-The trigger parameter can be a virtual element in addition to a DOM element. This allows you to use Popper with canvas. When the canvas is scrolled, you can manually call the `popper.onScroll()` method to trigger the pop-up layer to scroll.
+The trigger parameter can be a virtual element in addition to a DOM element. This allows you to use Popper with canvas. When the canvas is scrolled, you can manually call the `popper.onScroll()` method to trigger the popper to scroll.
 
 ```js
 const popper = new Popper({
@@ -204,8 +204,8 @@ canvas.on('scroll', () => popper.onScroll())
 | Name | Type | Default | Description |
 | -- | -- | -- | -- |
 | `container` | `HTMLElement` | `document.body` | The container of the popper. |
-| `content` | `Element` | | The content element to be popped up |
-| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | The trigger element |
+| `content` | `Element` | | Required. The content element to be popped up |
+| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | Required. The trigger element |
 | `arrow` | `Element` | | The arrow element. |
 | `placement` | `PLACEMENT` | `PLACEMENT.T` | The placement of the popper. |
 | `translate` | `[number, number]` | `[0, 0]` | The custom xy offset. |
@@ -219,6 +219,7 @@ canvas.on('scroll', () => popper.onScroll())
 | `closeDelay` | `number` | `50` | Close delay |
 | `open` | `boolean` | | Is it enabled by default |
 | `disabled` | `boolean` | | Disabled |
+| `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popper is opened. |
 | `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popper |
 | `overflowHidden` | `boolean` | automatically detected | Whether the container has overflow hidden. |
 | `coverTrigger` | `boolean` | | Whether to cover the trigger element with the popper. |
@@ -237,9 +238,9 @@ canvas.on('scroll', () => popper.onScroll())
 
 | Name | Type | Description |
 | -- | -- | -- |
-| `el` | `HTMLElement` | The pop-up layer element |
+| `el` | `HTMLElement` | The popper element |
 | `config` | `PopperConfig` | Popper configuration object |
-| `opening` | `boolean` | Indicates whether the pop-up layer is currently displayed |
+| `opened` | `boolean` | Indicates whether the popper is currently displayed |
 | `isAnimating` | `boolean` | Indicates whether a CSS animation is currently in progress |
 
 ### Methods
