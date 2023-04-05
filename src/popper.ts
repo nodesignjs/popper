@@ -77,6 +77,8 @@ export class Popper implements Destroyable {
 
   private closeTimer?: any;
 
+  private prevP?: PLACEMENT;
+
   constructor(config: PopperConfig) {
     if (config) this.init(config);
   }
@@ -340,6 +342,12 @@ export class Popper implements Destroyable {
     const { onBeforePosition, onOpen } = config;
     if (onBeforePosition) onBeforePosition(ret);
 
+    if (cssName && ret.position !== this.prevP) {
+      if (this.prevP) removeClass(el, `${config.cssName}-${this.prevP}`);
+      this.prevP = ret.position;
+      addClass(el, `${config.cssName}-${ret.position}`);
+    }
+
     if (ret.xy) {
       if (this.popHide) {
         this.popHide = false;
@@ -460,12 +468,14 @@ export class Popper implements Destroyable {
 
   private onTriEnter = () => {
     this.clearOCTimer();
+    if (this.isAnimating) this.closed = false;
     if (this.opened) return;
     this.openWithDelay();
   };
 
   private onTriLeave = () => {
     this.clearOCTimer();
+    if (this.isAnimating) this.closed = true;
     if (!this.opened) return;
     this.closeWithDelay();
   };
@@ -525,13 +535,13 @@ export class Popper implements Destroyable {
   private addEnterEv() {
     const { config } = this;
     if (config.enterable && config.emit === EmitType.HOVER) {
-      this.cel.addEventListener('mouseenter', this.clearOCTimer);
+      this.cel.addEventListener('mouseenter', this.onTriEnter);
       this.cel.addEventListener('mouseleave', this.onTriLeave);
     }
   }
 
   private removeEnterEv() {
-    this.cel.removeEventListener('mouseenter', this.clearOCTimer);
+    this.cel.removeEventListener('mouseenter', this.onTriEnter);
     this.cel.removeEventListener('mouseleave', this.onTriLeave);
   }
 

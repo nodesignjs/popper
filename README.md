@@ -79,6 +79,7 @@ Popper will add the following 6 classes through the cssName.
 `${cssName}-exit-from` // Starts hiding and is removed in the next frame.
 `${cssName}-exit-active` // Added in the next frame and removed when the animation ends.
 `${cssName}-exit-to` // Added in the next frame and removed when the animation ends.
+`${cssName}-${PLACEMENT}` // Current popper placement
 ```
 
 You can write CSS styles like this:

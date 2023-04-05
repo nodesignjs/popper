@@ -79,6 +79,7 @@ Popper 会通过 `cssName` 添加下面 6 个类。
 `${cssName}-exit-from` // 开始隐藏，下一帧被移除
 `${cssName}-exit-active` // 下一帧被添加，动画结束时移除
 `${cssName}-exit-to` // 下一帧被添加，动画结束时移除
+`${cssName}-${PLACEMENT}` // 当前弹窗位置
 ```
 
 你可以编写如下 css 样式。
