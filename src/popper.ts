@@ -122,7 +122,9 @@ export class Popper implements Destroyable {
     this.addTriEv();
     this.addEnterEv();
 
-    if (config.open) this.open();
+    if (config.open) {
+      requestAnimationFrame(() => this.open());
+    }
   }
 
   update() {
