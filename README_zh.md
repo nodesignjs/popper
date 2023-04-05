@@ -1,7 +1,7 @@
 # [Popper](https://cosmo-design.github.io/popper/)
 
 [![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
-[![npm version](https://img.badgesize.io/https:/unpkg.com/@cosmo-design/popper/dist/index.min.js?compression=gzip)](https://github.com/cosmo-design/popper) 
+[![npm version](https://img.shields.io/bundlephobia/minzip/@cosmo-design/popper)](https://github.com/cosmo-design/popper)
 
 Popper 是一个体积小，功能轻大的弹出工具库，它可以自动定位到 Trigger 附近合适的位置。同时它还支持虚拟元素，可以在 canvas 元素中使用，和 CSS 类动画。
 

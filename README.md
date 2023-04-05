@@ -1,7 +1,7 @@
 # [Popper](https://cosmo-design.github.io/popper/)
 
 [![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
-[![npm version](https://img.badgesize.io/https:/unpkg.com/@cosmo-design/popper/dist/index.min.js?compression=gzip)](https://github.com/cosmo-design/popper) 
+[![npm version](https://img.shields.io/bundlephobia/minzip/@cosmo-design/popper)](https://github.com/cosmo-design/popper)
 
 Popper is a small yet powerful popper library that can automatically pop up at a suitable position adjacent to the trigger. It also supports virtual elements, which can be used in canvas and CSS class animations.
 
