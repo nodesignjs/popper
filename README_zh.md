@@ -1,26 +1,26 @@
-# [Popper](https://cosmo-design.github.io/popper/)
+# [Popper](https://nodesignjs.github.io/popper/)
 
-[![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
-[![npm version](https://img.shields.io/bundlephobia/minzip/@cosmo-design/popper)](https://github.com/cosmo-design/popper)
+[![npm version](https://img.shields.io/npm/v/@nodesign/popper?logo=npm)](https://github.com/nodesignjs/popper) 
+[![npm version](https://img.shields.io/bundlephobia/minzip/@nodesign/popper)](https://github.com/nodesignjs/popper)
 
 Popper 是一个体积小，功能轻大的弹出工具库，它可以自动定位到 Trigger 附近合适的位置。同时它还支持虚拟元素，可以在 canvas 元素中使用，和 CSS 类动画。
 
-[在线体验](https://cosmo-design.github.io/popper/)
+[在线体验](https://nodesignjs.github.io/popper/)
 
-[![@cosmo-design/popper](./demo/p.png)](https://cosmo-design.github.io/popper/)
+[![@nodesign/popper](./demo/p.png)](https://nodesignjs.github.io/popper/)
 
 [English](./README_zh.md)
 
 ## 安装
 
 ```
-npm i @cosmo-design/popper
+npm i @nodesign/popper
 ```
 
 或者通过 CDN 使用
 
 ```html
-<script src="https://unpkg.com/@cosmo-design/popper@latest/dist/index.min.js"></script>
+<script src="https://unpkg.com/@nodesign/popper@latest/dist/index.min.js"></script>
 <script>
   console.log(popper)
 </script>
@@ -29,7 +29,7 @@ npm i @cosmo-design/popper
 ## 快速开始
 
 ```js
-import Popper, { PLACEMENT, EmitType } from '@cosmo-design/popper'
+import Popper, { PLACEMENT, EmitType } from '@nodesign/popper'
 
 const container = document.querySelector('.container'); // 默认: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -120,7 +120,7 @@ const popper = new Popper({
 或者通过内置的 `createArrow` 函数来快速创建 `arrow`。
 
 ```ts
-import Popper, { createArrow } from '@cosmo-design/popper' 
+import Popper, { createArrow } from '@nodesign/popper' 
 
 const popper = new Popper({
   arrow: createArrow({ background: '#000' })
@@ -339,7 +339,7 @@ update(): void;
 popper 还提供了快速创建 `arrow` 的工具方法。
 
 ```ts
-import Popper, { createArrow } from '@cosmo-design/popper'
+import Popper, { createArrow } from '@nodesign/popper'
 
 new Popper({
   arrow: createArrow()

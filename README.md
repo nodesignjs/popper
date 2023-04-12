@@ -1,26 +1,26 @@
-# [Popper](https://cosmo-design.github.io/popper/)
+# [Popper](https://nodesignjs.github.io/popper/)
 
-[![npm version](https://img.shields.io/npm/v/@cosmo-design/popper?logo=npm)](https://github.com/cosmo-design/popper) 
-[![npm version](https://img.shields.io/bundlephobia/minzip/@cosmo-design/popper)](https://github.com/cosmo-design/popper)
+[![npm version](https://img.shields.io/npm/v/@nodesign/popper?logo=npm)](https://github.com/nodesignjs/popper) 
+[![npm version](https://img.shields.io/bundlephobia/minzip/@nodesign/popper)](https://github.com/nodesignjs/popper)
 
 Popper is a small yet powerful popper library that can automatically pop up at a suitable position adjacent to the trigger. It also supports virtual elements, which can be used in canvas and CSS class animations.
 
-[Playground](https://cosmo-design.github.io/popper/)
+[Playground](https://nodesignjs.github.io/popper/)
 
-[![@cosmo-design/popper](./demo/p.png)](https://cosmo-design.github.io/popper/)
+[![@nodesign/popper](./demo/p.png)](https://nodesignjs.github.io/popper/)
 
 [中文文档](./README_zh.md)
 
 ## Install
 
 ```
-npm i @cosmo-design/popper
+npm i @nodesign/popper
 ```
 
 or via CDN
 
 ```html
-<script src="https://unpkg.com/@cosmo-design/popper@latest/dist/index.min.js"></script>
+<script src="https://unpkg.com/@nodesign/popper@latest/dist/index.min.js"></script>
 <script>
   console.log(popper)
 </script>
@@ -29,7 +29,7 @@ or via CDN
 ## Usage
 
 ```js
-import Popper, { PLACEMENT, EmitType } from '@cosmo-design/popper'
+import Popper, { PLACEMENT, EmitType } from '@nodesign/popper'
 
 const container = document.querySelector('.container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -120,7 +120,7 @@ const popper = new Popper({
 Alternatively, an arrow can be quickly created using the built-in `createArrow` function.
 
 ```ts
-import Popper, { createArrow } from '@cosmo-design/popper' 
+import Popper, { createArrow } from '@nodesign/popper' 
 
 const popper = new Popper({
   arrow: createArrow({ background: '#000' })
@@ -339,7 +339,7 @@ update(): void;
 Popper also provides utility methods for quickly creating `arrow` elements.
 
 ```ts
-import Popper, { createArrow } from '@cosmo-design/popper'
+import Popper, { createArrow } from '@nodesign/popper'
 
 new Popper({
   arrow: createArrow()
