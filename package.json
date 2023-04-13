@@ -1,17 +1,10 @@
 {
   "name": "@nodesign/popper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.min.js",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
   "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./dist/index.min.js"
-    }
-  },
   "authors": "oyuyue <oyuyue@outlook.com>",
   "repository": "git@github.com:nodesignjs/popper.git",
   "homepage": "https://github.com/nodesignjs/popper",

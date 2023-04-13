@@ -226,6 +226,8 @@ canvas.on('scroll', () => popper.onScroll())
 | `coverTrigger` | `boolean` | | Whether to cover the trigger element with the popper. |
 | `closeOnScroll` | `boolean` | | Whether to automatically close the popper when the trigger element is scrolled. |
 | `hideOnInvisible` | `boolean` | | Whether to automatically hide the popper when the trigger element is invisible on the screen. |
+| `keepDom` | `boolean` | | Keep popper elements in the DOM | 
+| `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popper coordinates | 
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |

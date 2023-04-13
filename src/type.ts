@@ -29,6 +29,8 @@ export interface PopperConfig {
   coverTrigger?: boolean;
   closeOnScroll?: boolean;
   hideOnInvisible?: boolean;
+  keepDom?: boolean;
+  useTriggerPos?: boolean;
   onBeforeEnter?: () => void;
   onEntered?: () => void;
   onBeforeExit?: () => void;

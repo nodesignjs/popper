@@ -25,8 +25,8 @@ export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
   const el = $();
   if (cls) addClass(el, cls);
   Object.assign(el.style, {
-    width: '12px',
-    height: '12px',
+    width: '10px',
+    height: '10px',
     transform: 'rotate(45deg)',
     transformOrigin: 'center',
     ...style,
@@ -84,7 +84,6 @@ export class Popper implements Destroyable {
   }
 
   protected init(config: PopperConfig) {
-    const oldContainer = config.container;
     config = this.config = getConfig(config);
 
     this.cel = $();
@@ -96,12 +95,7 @@ export class Popper implements Destroyable {
       content, container, trigger,
     } = config;
 
-    const info = getContainerInfo(container!);
-    if (config.overflowHidden == null) config.overflowHidden = info.clip;
-    if (oldContainer && !info.position || info.position === 'static') {
-      container!.style.position = 'relative';
-    }
-
+    if (config.overflowHidden == null) config.overflowHidden = isElClipped(container!);
     this.el = this.cel.appendChild($());
     this.el.appendChild(content);
 
@@ -124,6 +118,11 @@ export class Popper implements Destroyable {
 
     if (config.open) {
       requestAnimationFrame(() => this.open());
+    }
+
+    if (config.keepDom) {
+      hideDom(this.cel);
+      container!.appendChild(this.cel);
     }
   }
 
@@ -166,6 +165,17 @@ export class Popper implements Destroyable {
         case 'enterable':
           this.removeEnterEv();
           if (n) this.addEnterEv();
+          break;
+        case 'keepDom':
+          if (n) {
+            if (!this.opened) {
+              hideDom(this.cel);
+              config.container!.appendChild(this.cel);
+            }
+          } else if (!this.opened) {
+              config.container!.removeChild(this.cel);
+              showDom(this.cel);
+          }
           break;
         case 'trigger': {
           const oldIsTriggerEl = this.isTriggerEl;
@@ -289,7 +299,7 @@ export class Popper implements Destroyable {
     const fromHide = !opened;
     if (fromHide) {
       if (this.isAnimating) return;
-      container!.appendChild(this.cel);
+      this.show();
       this.scrollEls?.forEach((x) => {
         x.addEventListener('scroll', this.onScroll, { passive: true });
       });
@@ -331,7 +341,10 @@ export class Popper implements Destroyable {
       });
     }
 
-    const ret = getPopStyle(
+    const ret = config.useTriggerPos ? {
+      xy: [triggerBcr.left, triggerBcr.top],
+      position: config.placement!,
+    } : getPopStyle(
       config.placement!,
       containerBcr,
       triggerBcr,
@@ -401,7 +414,7 @@ export class Popper implements Destroyable {
         info.promise.then(this.onHideTransitionEnd);
       });
     } else {
-      config.container!.removeChild(this.cel);
+      this.hide();
     }
 
     if (this.isTriggerEl && config.triggerOpenClass) {
@@ -460,6 +473,24 @@ export class Popper implements Destroyable {
       }, closeDelay);
     } else {
       this.close();
+    }
+  }
+
+  private show() {
+    const { config } = this;
+    if (config.keepDom) {
+      showDom(this.cel);
+    } else {
+      config.container!.appendChild(this.cel);
+    }
+  }
+
+  private hide() {
+    const { config } = this;
+    if (config.keepDom) {
+      hideDom(this.cel);
+    } else {
+      config.container!.removeChild(this.cel);
     }
   }
 
@@ -597,7 +628,7 @@ export class Popper implements Destroyable {
   private onHideTransitionEnd = () => {
     const { cssName, config, el } = this;
     const { onExited } = config;
-    config.container!.removeChild(this.cel);
+    this.hide();
     removeClass(el, cssName!.exitActive);
     removeClass(el, cssName!.exitTo);
     this.isAnimating = false;
@@ -988,15 +1019,12 @@ function toMs(s: string): number {
   return Number(s.slice(0, -1).replace(',', '.')) * 1000;
 }
 
-function getContainerInfo(element: Element) {
+function isElClipped(element: Element) {
   const {
-    overflow, overflowX, overflowY, position,
+    overflow, overflowX, overflowY,
   } = window.getComputedStyle(element);
   const o = overflow + overflowY + overflowX;
-  return {
-    clip: o.includes('hidden') || o.includes('clip'),
-    position,
-  };
+  return o.includes('hidden') || o.includes('clip');
 }
 
 function hideDom(el: HTMLElement) {
