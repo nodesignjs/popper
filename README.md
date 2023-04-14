@@ -228,6 +228,8 @@ canvas.on('scroll', () => popper.onScroll())
 | `hideOnInvisible` | `boolean` | | Whether to automatically hide the popper when the trigger element is invisible on the screen. |
 | `keepDom` | `boolean` | | Keep popper elements in the DOM | 
 | `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popper coordinates | 
+| `closeAni` | `boolean` | `true` | Whether to animate when closing |
+| `dragEl` | `HTMLElement` | | The DOM element used to drag the popper position |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |

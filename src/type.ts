@@ -14,6 +14,7 @@ export interface PopperConfig {
   closeDelay?: number;
   open?: boolean;
   disabled?: boolean;
+  dragEl?: HTMLElement;
   enterable?: boolean;
   container?: HTMLElement;
   trigger: { getBoundingClientRect: () => Rect } | Element;
@@ -31,6 +32,7 @@ export interface PopperConfig {
   hideOnInvisible?: boolean;
   keepDom?: boolean;
   useTriggerPos?: boolean;
+  closeAni?: boolean;
   onBeforeEnter?: () => void;
   onEntered?: () => void;
   onBeforeExit?: () => void;

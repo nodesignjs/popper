@@ -227,7 +227,9 @@ canvas.on('scroll', () => popper.onScroll())
 | `closeOnScroll` | `boolean` | | 是否在滚动时自动关闭 |
 | `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 |
 | `keepDom` | `boolean` | | 保留弹窗元素一直在 DOM 中 | 
-| `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 | 
+| `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 |
+| `closeAni` | `boolean` | `true` | 是否需要关闭动画 |
+| `dragEl` | `HTMLElement` | | 用于拖拽弹窗的 DOM 元素 |
 | `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |
 | `onEntered` | `() => void` | | css 进入动画完成时 |
 | `onBeforeExit` | `() => void` | | css 关闭动画开始之前 |

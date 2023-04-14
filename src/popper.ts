@@ -1,5 +1,5 @@
 import {
-  addClass, Destroyable, removeClass, destroy, throttle, $, getChangedAttrs,
+  addClass, Destroyable, removeClass, destroy, throttle, $, getChangedAttrs, Drag, clamp,
 } from 'wblib';
 import type {
   Position, Rect, PopperConfig, CssName, TransitionInfo,
@@ -15,6 +15,7 @@ function getConfig(config: PopperConfig) {
     autoScroll: true,
     translate: [0, 0],
     clickOutsideClose: true,
+    closeAni: true,
     enterable: true,
     closeDelay: 50,
     ...config,
@@ -78,6 +79,8 @@ export class Popper implements Destroyable {
   private closeTimer?: any;
 
   private prevP?: PLACEMENT;
+
+  private drag?: Drag;
 
   constructor(config: PopperConfig) {
     if (config) this.init(config);
@@ -286,6 +289,10 @@ export class Popper implements Destroyable {
     this.removeDocClick();
     this.removeEmitEv();
     this.removeEnterEv();
+    if (this.drag) {
+      this.drag.destroy();
+      this.drag = undefined;
+    }
     destroy(this);
   }
 
@@ -366,12 +373,30 @@ export class Popper implements Destroyable {
       addClass(el, `${config.cssName}-${ret.position}`);
     }
 
-    if (ret.xy) {
+    const { xy } = ret;
+    if (xy) {
       if (this.popHide) {
         this.popHide = false;
         showDom(this.cel);
       }
-      this.cel.style.transform = `translate3d(${ret.xy[0]}px,${ret.xy[1]}px,0)`;
+      this.cel.style.transform = `translate3d(${xy[0]}px,${xy[1]}px,0)`;
+      if (fromHide && config.dragEl) {
+        const diffXY: number[] = [];
+        const curXY: number[] = [];
+        const maxX = containerBcr.width - popBcr.width;
+        const maxY = containerBcr.height - popBcr.height;
+        this.drag = new Drag(config.dragEl, (ev: PointerEvent) => {
+          diffXY[0] = xy[0] - ev.clientX;
+          diffXY[1] = xy[1] - ev.clientY;
+        }, (ev: PointerEvent) => {
+          curXY[0] = clamp(diffXY[0] + ev.clientX, 0, maxX);
+          curXY[1] = clamp(diffXY[1] + ev.clientY, 0, maxY);
+          this.cel.style.transform = `translate3d(${curXY[0]}px,${curXY[1]}px,0)`;
+        }, () => {
+          xy[0] = curXY[0];
+          xy[1] = curXY[1];
+        });
+      }
     } else if (!this.popHide) {
       hideDom(this.cel);
       this.popHide = true;
@@ -399,7 +424,7 @@ export class Popper implements Destroyable {
 
     const { config, cssName, el } = this;
     const { onClose } = config;
-    if (cssName) {
+    if (config.closeAni && cssName) {
       const { onBeforeExit } = config;
       if (onBeforeExit) onBeforeExit();
       addClass(el, cssName.exitFrom);
@@ -423,6 +448,10 @@ export class Popper implements Destroyable {
 
     this.removeScrollEv();
     this.removeDocClick();
+    if (this.drag) {
+      this.drag.destroy();
+      this.drag = undefined;
+    }
     if (onClose) onClose();
     document.removeEventListener('click', this.onDocClick);
   }
