@@ -7,19 +7,24 @@ import type {
 import { EmitType, PLACEMENT } from './constant';
 
 function getConfig(config: PopperConfig) {
-  return {
+  const cfg = {
     container: document.body,
     placement: PLACEMENT.T,
     autoPlacement: true,
     autoUpdate: true,
     autoScroll: true,
-    translate: [0, 0],
     clickOutsideClose: true,
     closeAni: true,
     enterable: true,
-    closeDelay: 50,
+    maxHeight: true,
     ...config,
   } as PopperConfig;
+
+  if (!cfg.translate) {
+    cfg.translate = [0, 0];
+  }
+
+  return cfg;
 }
 
 export function createArrow(style?: CSSStyleDeclaration, cls?: string) {
@@ -260,6 +265,18 @@ export class Popper implements Destroyable {
         case 'disabled':
           if (n) this.disable();
           break;
+        case 'maxHeight':
+          if (!n) {
+            const { style } = (config.content as HTMLElement);
+            if (style) style.maxHeight = '';
+          }
+          break;
+        case 'maxWidth':
+          if (!n) {
+            const { style } = (config.content as HTMLElement);
+            if (style) style.maxWidth = '';
+          }
+          break;
       }
     });
 
@@ -310,8 +327,16 @@ export class Popper implements Destroyable {
       this.scrollEls?.forEach((x) => {
         x.addEventListener('scroll', this.onScroll, { passive: true });
       });
-      document.addEventListener('click', this.onDocClick);
+      document.addEventListener('pointerdown', this.onDocClick);
     }
+
+    const cStyle = (config.content as HTMLElement).style;
+    const needMaxHeight = cStyle && config.maxHeight;
+    const needMaxWidth = cStyle && config.maxWidth;
+
+    if (needMaxHeight) cStyle.maxHeight = '';
+    if (needMaxWidth) cStyle.maxWidth = '';
+
     this.opened = true;
     const popBcr = el.getBoundingClientRect();
     const containerBcr = container!.getBoundingClientRect();
@@ -351,6 +376,8 @@ export class Popper implements Destroyable {
     const ret = config.useTriggerPos ? {
       xy: [triggerBcr.left, triggerBcr.top],
       position: config.placement!,
+      maxHeight: needMaxHeight ? containerBcr.height - triggerBcr.top : 0,
+      maxWidth: needMaxWidth ? containerBcr.width - triggerBcr.left : 0,
     } : getPopStyle(
       config.placement!,
       containerBcr,
@@ -362,6 +389,9 @@ export class Popper implements Destroyable {
       config.coverTrigger,
       arrowBcr,
       config.hideOnInvisible,
+      config.changePosOnly,
+      needMaxHeight,
+      needMaxWidth,
     );
 
     const { onBeforePosition, onOpen } = config;
@@ -380,6 +410,12 @@ export class Popper implements Destroyable {
         showDom(this.cel);
       }
       this.cel.style.transform = `translate3d(${xy[0]}px,${xy[1]}px,0)`;
+      if (needMaxHeight && ret.maxHeight) {
+        cStyle.maxHeight = `${ret.maxHeight}px`;
+      }
+      if (needMaxWidth && ret.maxWidth) {
+        cStyle.maxWidth = `${ret.maxWidth}px`;
+      }
       if (fromHide && config.dragEl) {
         const diffXY: number[] = [];
         const curXY: number[] = [];
@@ -453,7 +489,7 @@ export class Popper implements Destroyable {
       this.drag = undefined;
     }
     if (onClose) onClose();
-    document.removeEventListener('click', this.onDocClick);
+    document.removeEventListener('pointerdown', this.onDocClick);
   }
 
   toggle() {
@@ -551,7 +587,7 @@ export class Popper implements Destroyable {
   };
 
   private removeDocClick = () => {
-    document.removeEventListener('click', this.onDocClick);
+    document.removeEventListener('pointerdown', this.onDocClick);
   };
 
   private removeEmitEv(el?: HTMLElement) {
@@ -841,7 +877,10 @@ function getFitPosition(
   translate: number[],
   direction: PLACEMENT,
   overflow?: boolean,
-) {
+  changePosOnly?: boolean,
+  needMaxHeight?: boolean,
+  needMaxWidth?: boolean,
+): [PLACEMENT, number, number] {
   const viewPortSize = [
     document.documentElement.clientWidth || window.innerWidth,
     document.documentElement.clientHeight || window.innerHeight,
@@ -853,28 +892,31 @@ function getFitPosition(
     overflow ? Math.min(containerRect.left + containerRect.width, viewPortSize[0]) : viewPortSize[0],
     overflow ? Math.min(containerRect.top + containerRect.height, viewPortSize[1]) : viewPortSize[1],
   ];
+
   const x = containerRect.left + popupPosition[0];
   const y = containerRect.top + popupPosition[1];
   const popRect = [
-    containerRect.left + popupPosition[0],
-    containerRect.top + popupPosition[1],
+    x,
+    y,
     x + popWH.width,
     y + popWH.height,
   ];
+
   const triggerX = containerRect.left + triggerRect.left;
   const triggerY = containerRect.top + triggerRect.top;
   const triggerEx = triggerX + triggerRect.width;
   const triggerEy = triggerY + triggerRect.height;
   let finalPosition = position;
+
   if (direction === PLACEMENT.T) {
     if (y < boundary[1]) {
       if (boundary[3] - triggerEy + translate[1] >= popWH.height && triggerEy - translate[1] >= boundary[1]) {
         popupPosition[1] = getPopupOffset(PLACEMENT.B, triggerRect, popWH, [translate[0], -translate[1]])[1];
         finalPosition = changePosition(position, PLACEMENT.B);
-      } else {
+      } else if (!changePosOnly) {
         popupPosition[1] = overflow ? 0 : -containerRect.top;
       }
-    } else if (popRect[3] > boundary[3]) {
+    } else if (!changePosOnly && popRect[3] > boundary[3]) {
       popupPosition[1] = overflow ? containerRect.height - popWH.height : viewPortSize[1] - containerRect.top - popWH.height;
     }
   } else if (direction === PLACEMENT.B) {
@@ -882,10 +924,10 @@ function getFitPosition(
       if (triggerY - boundary[1] - translate[1] >= popWH.height && triggerY - translate[1] <= boundary[3]) {
         popupPosition[1] = getPopupOffset(PLACEMENT.T, triggerRect, popWH, [translate[0], -translate[1]])[1];
         finalPosition = changePosition(position, PLACEMENT.T);
-      } else {
+      } else if (!changePosOnly) {
         popupPosition[1] = overflow ? containerRect.height - popWH.height : viewPortSize[1] - containerRect.top - popWH.height;
       }
-    } else if (y < boundary[1]) {
+    } else if (!changePosOnly && y < boundary[1]) {
       popupPosition[1] = overflow ? 0 : -containerRect.top;
     }
   } else if (direction === PLACEMENT.L) {
@@ -893,10 +935,10 @@ function getFitPosition(
       if (boundary[2] - triggerEx + translate[0] >= popWH.width && triggerEx - translate[0] >= boundary[0]) {
         finalPosition = changePosition(position, PLACEMENT.R);
         popupPosition[0] = getPopupOffset(PLACEMENT.R, triggerRect, popWH, [-translate[0], translate[1]])[0];
-      } else {
+      } else if (!changePosOnly) {
         popupPosition[0] = overflow ? 0 : -containerRect.left;
       }
-    } else if (popRect[2] > boundary[2]) {
+    } else if (!changePosOnly && popRect[2] > boundary[2]) {
       popupPosition[0] = overflow ? containerRect.width - popWH.width : viewPortSize[0] - containerRect.left + popWH.width;
     }
   } else if (direction === PLACEMENT.R) {
@@ -904,29 +946,77 @@ function getFitPosition(
       if (triggerX - boundary[0] - translate[0] >= popWH.width && triggerX - translate[0] <= boundary[2]) {
         finalPosition = changePosition(position, PLACEMENT.L);
         popupPosition[0] = getPopupOffset(PLACEMENT.L, triggerRect, popWH, [-translate[0], translate[1]])[0];
-      } else {
+      } else if (!changePosOnly) {
         popupPosition[0] = overflow ? containerRect.width - popWH.width : viewPortSize[0] - containerRect.left + popWH.width;
       }
-    } else if (x < boundary[0]) {
+    } else if (!changePosOnly && x < boundary[0]) {
       popupPosition[0] = overflow ? 0 : -containerRect.left;
     }
   }
 
   if (direction === PLACEMENT.T || direction === PLACEMENT.B) {
     if (x < boundary[0]) {
-      popupPosition[0] = overflow ? 0 : -containerRect.left;
+      const isBr = finalPosition === PLACEMENT.BR;
+      const l = triggerX - translate[0];
+      if ((isBr || finalPosition === PLACEMENT.TR) && l >= 0 && l + popWH.width <= boundary[2]) {
+        popupPosition[0] = l - containerRect.left;
+        finalPosition = isBr ? PLACEMENT.BL : PLACEMENT.TL;
+      } else {
+        popupPosition[0] = overflow ? Math.max(-containerRect.left, 0) : -containerRect.left;
+      }
     } else if (popRect[2] > boundary[2]) {
-      popupPosition[0] = overflow ? containerRect.width - popWH.width : viewPortSize[0] - containerRect.left + popWH.width;
+      const isBl = finalPosition === PLACEMENT.BL;
+      const l = triggerEx - translate[0];
+      if ((isBl || finalPosition === PLACEMENT.TL) && l <= boundary[2] && l - popWH.width >= boundary[0]) {
+        popupPosition[0] = l - containerRect.left - popWH.width;
+        finalPosition = isBl ? PLACEMENT.BR : PLACEMENT.TR;
+      } else {
+        popupPosition[0] = overflow ? boundary[2] - containerRect.left - popWH.width : viewPortSize[0] - containerRect.left + popWH.width;
+      }
     }
   } else if (direction === PLACEMENT.L || direction === PLACEMENT.R) {
     if (y < boundary[1]) {
-      popupPosition[1] = overflow ? 0 : -containerRect.top;
+      const isRb = finalPosition === PLACEMENT.RB;
+      const t = triggerY - translate[1];
+      if ((isRb || finalPosition === PLACEMENT.LB) && t >= boundary[1] && t + popWH.height <= boundary[3]) {
+        popupPosition[1] = t - containerRect.top;
+        finalPosition = isRb ? PLACEMENT.RT : PLACEMENT.LT;
+      } else {
+        popupPosition[1] = overflow ? Math.max(-containerRect.top, 0) : -containerRect.top;
+      }
     } else if (popRect[3] > boundary[3]) {
-      popupPosition[1] = overflow ? containerRect.height - popWH.height : viewPortSize[1] - containerRect.top - popWH.height;
+      const isRt = finalPosition === PLACEMENT.RT;
+      const t = triggerEy - translate[1];
+      if ((isRt || finalPosition === PLACEMENT.LT) && t <= boundary[3] && t - popWH.height >= boundary[1]) {
+        popupPosition[1] = t - containerRect.top - popWH.height;
+        finalPosition = isRt ? PLACEMENT.RB : PLACEMENT.LB;
+      } else {
+        popupPosition[1] = overflow ? boundary[3] - containerRect.top - popWH.height : viewPortSize[1] - containerRect.top - popWH.height;
+      }
     }
   }
 
-  return finalPosition;
+  let maxHeight = 0;
+  let maxWidth = 0;
+  if (needMaxHeight) {
+    if (direction === PLACEMENT.T || finalPosition === PLACEMENT.LT || finalPosition === PLACEMENT.RT) {
+      maxHeight = popupPosition[1] + popWH.height;
+      if (popupPosition[1] < 0 && triggerRect.top > 0) popupPosition[1] = 0;
+    } else {
+      maxHeight = containerRect.height - popupPosition[1];
+    }
+  }
+
+  if (needMaxWidth) {
+    if (direction === PLACEMENT.L) {
+      maxWidth = popupPosition[0] + popWH.width;
+      if (popupPosition[0] < 0 && triggerRect.left > 0) popupPosition[0] = 0;
+    } else {
+      maxWidth = containerRect.width - popupPosition[0];
+    }
+  }
+
+  return [finalPosition, maxHeight, maxWidth];
 }
 
 function getPopStyle(
@@ -941,6 +1031,9 @@ function getPopStyle(
   coverTrigger?: boolean,
   arrowWH?: Rect,
   hideOnInvisible?: boolean,
+  changePosOnly?: boolean,
+  needMaxHeight?: boolean,
+  needMaxWidth?: boolean,
 ): Position {
   const triggerOut = triggerRect.left >= containerRect.width
   || triggerRect.top >= containerRect.height
@@ -967,8 +1060,11 @@ function getPopStyle(
 
   const popupPosition = getPopupOffset(position, triggerRect, popWH, translate);
 
+  let maxHeight = 0;
+  let maxWidth = 0;
+
   if (autoFit) {
-    position = getFitPosition(
+    [position, maxHeight, maxWidth] = getFitPosition(
       position,
       popupPosition,
       containerRect,
@@ -977,6 +1073,9 @@ function getPopStyle(
       translate,
       der,
       overflow,
+      changePosOnly,
+      needMaxHeight,
+      needMaxWidth,
     );
   }
 
@@ -991,14 +1090,14 @@ function getPopStyle(
       if (arrowXY[1] < half[1] || arrowXY[1] > popWH.height - arrowWH.height - half[1]) {
         arrowXY = undefined;
       } else {
-        arrowXY[0] = (isL ? popWH.width : 0) - half[0];
+        arrowXY[0] = (isL ? maxWidth ? Math.min(maxWidth, popWH.width) : popWH.width : 0) - half[0];
       }
     } else {
       arrowXY[0] = triggerRect.left + triggerRect.width / 2 - popupPosition[0] - half[0];
       if (arrowXY[0] < half[0] || arrowXY[0] > popWH.width - arrowWH.width - half[0]) {
         arrowXY = undefined;
       } else {
-        arrowXY[1] = (der === PLACEMENT.T ? popWH.height : 0) - half[1];
+        arrowXY[1] = (der === PLACEMENT.T ? maxHeight ? Math.min(maxHeight, popWH.height) : popWH.height : 0) - half[1];
       }
     }
   }
@@ -1007,6 +1106,8 @@ function getPopStyle(
     xy: popupPosition,
     arrowXY,
     position,
+    maxHeight,
+    maxWidth,
   };
 }
 

@@ -21,7 +21,7 @@
     }
   },
   "rules": {
-    "max-len": ["error", { "code": 130, "ignoreStrings": true, "ignoreUrls": true }],
+    "max-len": ["error", { "code": 150, "ignoreStrings": true, "ignoreUrls": true }],
     "import/no-unresolved": ["error", { "ignore": ["react"] }],
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/no-explicit-any": 0,

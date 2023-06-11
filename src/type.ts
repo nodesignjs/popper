@@ -4,6 +4,8 @@ export interface Position {
   position: PLACEMENT,
   xy?: number[];
   arrowXY?: number[];
+  maxHeight?: number;
+  maxWidth?: number;
 }
 export type Rect = { left: number, top: number, width: number, height: number }
 export interface PopperConfig {
@@ -13,6 +15,9 @@ export interface PopperConfig {
   openDelay?: number;
   closeDelay?: number;
   open?: boolean;
+  maxHeight?: boolean;
+  maxWidth?: boolean;
+  changePosOnly?: boolean;
   disabled?: boolean;
   dragEl?: HTMLElement;
   enterable?: boolean;
