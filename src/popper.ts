@@ -600,12 +600,14 @@ export class Popper implements Destroyable {
   }
 
   private onDocClick = ({ target }: MouseEvent) => {
-    const { onClickOutside, clickOutsideClose } = this.config;
+    const { config } = this;
+    const { onClickOutside, clickOutsideClose } = config;
 
     if (onClickOutside || clickOutsideClose) {
       if (
-        this.el?.contains((target as HTMLElement))
-        || (this.isTriggerEl && (this.config.trigger as HTMLElement)?.contains(target as HTMLElement))
+        this.el?.contains((target as Element))
+        || (this.isTriggerEl && (config.trigger as Element)?.contains(target as Element))
+        || (config.clickOutsideIgnoreEl && config.clickOutsideIgnoreEl.contains(target as Element))
       ) return;
       onClickOutside?.();
       if (clickOutsideClose) this.closeWithDelay();
@@ -917,7 +919,7 @@ function getFitPosition(
         popupPosition[1] = overflow ? 0 : -containerRect.top;
       }
     } else if (!changePosOnly && popRect[3] > boundary[3]) {
-      popupPosition[1] = overflow ? containerRect.height - popWH.height : viewPortSize[1] - containerRect.top - popWH.height;
+      popupPosition[1] = overflow ? Math.max(containerRect.height - popWH.height, 0) : viewPortSize[1] - containerRect.top - popWH.height;
     }
   } else if (direction === PLACEMENT.B) {
     if (popRect[3] > boundary[3]) {
@@ -925,7 +927,7 @@ function getFitPosition(
         popupPosition[1] = getPopupOffset(PLACEMENT.T, triggerRect, popWH, [translate[0], -translate[1]])[1];
         finalPosition = changePosition(position, PLACEMENT.T);
       } else if (!changePosOnly) {
-        popupPosition[1] = overflow ? containerRect.height - popWH.height : viewPortSize[1] - containerRect.top - popWH.height;
+        popupPosition[1] = overflow ? Math.max(containerRect.height - popWH.height, 0) : viewPortSize[1] - containerRect.top - popWH.height;
       }
     } else if (!changePosOnly && y < boundary[1]) {
       popupPosition[1] = overflow ? 0 : -containerRect.top;
@@ -939,7 +941,7 @@ function getFitPosition(
         popupPosition[0] = overflow ? 0 : -containerRect.left;
       }
     } else if (!changePosOnly && popRect[2] > boundary[2]) {
-      popupPosition[0] = overflow ? containerRect.width - popWH.width : viewPortSize[0] - containerRect.left + popWH.width;
+      popupPosition[0] = overflow ? Math.max(containerRect.width - popWH.width, 0) : viewPortSize[0] - containerRect.left + popWH.width;
     }
   } else if (direction === PLACEMENT.R) {
     if (popRect[2] > boundary[2]) {
@@ -947,7 +949,7 @@ function getFitPosition(
         finalPosition = changePosition(position, PLACEMENT.L);
         popupPosition[0] = getPopupOffset(PLACEMENT.L, triggerRect, popWH, [-translate[0], translate[1]])[0];
       } else if (!changePosOnly) {
-        popupPosition[0] = overflow ? containerRect.width - popWH.width : viewPortSize[0] - containerRect.left + popWH.width;
+        popupPosition[0] = overflow ? Math.max(containerRect.width - popWH.width, 0) : viewPortSize[0] - containerRect.left + popWH.width;
       }
     } else if (!changePosOnly && x < boundary[0]) {
       popupPosition[0] = overflow ? 0 : -containerRect.left;
@@ -1000,7 +1002,7 @@ function getFitPosition(
   let maxWidth = 0;
   if (needMaxHeight) {
     if (direction === PLACEMENT.T || finalPosition === PLACEMENT.LT || finalPosition === PLACEMENT.RT) {
-      maxHeight = popupPosition[1] + popWH.height;
+      maxHeight = Math.min(popupPosition[1] + popWH.height, boundary[3] - boundary[1]);
       if (popupPosition[1] < 0 && triggerRect.top > 0) popupPosition[1] = 0;
     } else {
       maxHeight = containerRect.height - popupPosition[1];

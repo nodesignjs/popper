@@ -12,6 +12,7 @@ export interface PopperConfig {
   content: Node;
   emit?: EmitType,
   clickOutsideClose?: boolean;
+  clickOutsideIgnoreEl?: Element;
   openDelay?: number;
   closeDelay?: number;
   open?: boolean;
