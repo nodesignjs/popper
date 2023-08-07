@@ -10,7 +10,7 @@ const type = process.env.BUILD_TYPE
 if (type === 'demo') {
   fs.rmSync('./docs', { recursive: true, force: true })
 } else {
-  fs.rmSync('./lib', { recursive: true, force: true })
+  fs.rmSync('./es', { recursive: true, force: true })
   if (type !== 'es') {
     fs.rmSync('./dist', { recursive: true, force: true })
   }
@@ -50,7 +50,7 @@ export default defineConfig(({ command }) => {
             output: {
               manualChunks: undefined,
               format: 'es',
-              dir: './lib',
+              dir: './es',
               preserveModules: true,
               entryFileNames: '[name].js',
               assetFileNames: '[name][extname]',

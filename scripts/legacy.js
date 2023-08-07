@@ -1,5 +1,5 @@
-const { DEFAULT_EXTENSIONS } = require('@babel/core')
-const { createBabelInputPluginFactory } = require('@rollup/plugin-babel');
+import { DEFAULT_EXTENSIONS } from '@babel/core'
+import { createBabelInputPluginFactory } from '@rollup/plugin-babel'
 
 const plugin = createBabelInputPluginFactory(() => ({
   options() {
@@ -23,7 +23,7 @@ const plugin = createBabelInputPluginFactory(() => ({
       presets: [
         ...(config.options.presets || []),
         [
-          require('@babel/preset-env'),
+          '@babel/preset-env',
           {
             modules: false,
             bugfixes: true,
@@ -37,7 +37,7 @@ const plugin = createBabelInputPluginFactory(() => ({
   },
 }));
 
-module.exports = () => ({
+export default () => ({
   ...plugin(),
   enforce: 'post',
 })

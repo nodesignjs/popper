@@ -1,5 +1,6 @@
 dist
 lib
+es
 scripts
 __tests__
 *.js

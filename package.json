@@ -1,20 +1,31 @@
 {
   "name": "@nodesign/popper",
-  "version": "1.1.1",
+  "version": "1.1.2",
+  "type": "module",
   "main": "dist/index.min.js",
-  "module": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "module": "es/index.js",
+  "types": "es/index.d.ts",
   "sideEffects": false,
   "authors": "oyuyue <oyuyue@outlook.com>",
   "repository": "git@github.com:nodesignjs/popper.git",
   "homepage": "https://github.com/nodesignjs/popper",
+  "exports": {
+    ".": {
+      "import": "./es/index.js",
+      "require": "./dist/index.min.js",
+      "types": "./es/index.d.ts"
+    },
+    "./dist/*": "./dist/*",
+    "./es/*": "./es/*",
+    "./package.json": "./package.json"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "files": [
     "dist",
-    "lib"
+    "es"
   ],
   "keywords": [
     "popup",
@@ -32,23 +43,23 @@
     "lint": "eslint src/**/*.ts --fix"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
+    "@babel/core": "^7.22.9",
     "@babel/preset-env": "^7.18.9",
-    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-babel": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "@vitejs/plugin-legacy": "^2.0.0",
-    "enquirer": "^2.3.6",
+    "enquirer": "^2.4.1",
     "eslint": "^8.20.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "execa": "^5.1.0",
-    "semver": "^7.3.7",
+    "execa": "^7.2.0",
+    "semver": "^7.5.4",
     "terser": "^5.14.2",
     "typescript": "^4.7.4",
     "vite": "^3.0.3"
   },
   "dependencies": {
-    "wblib": "^1.0.14"
+    "wblib": "^1.0.15"
   }
 }
