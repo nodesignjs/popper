@@ -374,7 +374,7 @@ export class Popper implements Destroyable {
     }
 
     const ret = config.useTriggerPos ? {
-      xy: [triggerBcr.left, triggerBcr.top],
+      xy: [Math.round(triggerBcr.left), Math.round(triggerBcr.top)],
       position: config.placement!,
       maxHeight: needMaxHeight ? containerBcr.height - triggerBcr.top : 0,
       maxWidth: needMaxWidth ? containerBcr.width - triggerBcr.left : 0,
@@ -425,8 +425,8 @@ export class Popper implements Destroyable {
           diffXY[0] = xy[0] - ev.clientX;
           diffXY[1] = xy[1] - ev.clientY;
         }, (ev: PointerEvent) => {
-          curXY[0] = clamp(diffXY[0] + ev.clientX, 0, maxX);
-          curXY[1] = clamp(diffXY[1] + ev.clientY, 0, maxY);
+          curXY[0] = Math.round(clamp(diffXY[0] + ev.clientX, 0, maxX));
+          curXY[1] = Math.round(clamp(diffXY[1] + ev.clientY, 0, maxY));
           this.cel.style.transform = `translate3d(${curXY[0]}px,${curXY[1]}px,0)`;
         }, () => {
           xy[0] = curXY[0];
@@ -1088,21 +1088,24 @@ function getPopStyle(
     const half = [arrowWH.width / 2, arrowWH.height / 2];
     const isL = der === PLACEMENT.L;
     if (isL || der === PLACEMENT.R) {
-      arrowXY[1] = triggerRect.top + triggerRect.height / 2 - popupPosition[1] - half[1];
+      arrowXY[1] = Math.round(triggerRect.top + triggerRect.height / 2 - popupPosition[1] - half[1]);
       if (arrowXY[1] < half[1] || arrowXY[1] > popWH.height - arrowWH.height - half[1]) {
         arrowXY = undefined;
       } else {
-        arrowXY[0] = (isL ? maxWidth ? Math.min(maxWidth, popWH.width) : popWH.width : 0) - half[0];
+        arrowXY[0] = Math.round((isL ? maxWidth ? Math.min(maxWidth, popWH.width) : popWH.width : 0) - half[0]);
       }
     } else {
-      arrowXY[0] = triggerRect.left + triggerRect.width / 2 - popupPosition[0] - half[0];
+      arrowXY[0] = Math.round(triggerRect.left + triggerRect.width / 2 - popupPosition[0] - half[0]);
       if (arrowXY[0] < half[0] || arrowXY[0] > popWH.width - arrowWH.width - half[0]) {
         arrowXY = undefined;
       } else {
-        arrowXY[1] = (der === PLACEMENT.T ? maxHeight ? Math.min(maxHeight, popWH.height) : popWH.height : 0) - half[1];
+        arrowXY[1] = Math.round((der === PLACEMENT.T ? maxHeight ? Math.min(maxHeight, popWH.height) : popWH.height : 0) - half[1]);
       }
     }
   }
+
+  popupPosition[0] = Math.round(popupPosition[0]);
+  popupPosition[1] = Math.round(popupPosition[1]);
 
   return {
     xy: popupPosition,
